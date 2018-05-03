@@ -1,0 +1,957 @@
+My notes for Machine Language for the Commodore 64 and other Commodore computers by Jim Butterfield
+
+
+page 14: START MLM => SYS 8
+
+LDA $0380
+LDX $0381
+STA $0381
+STX $0380
+
+16^1 = 16
+16^2 = 256
+16^3 = 4096
+16^4 = 65536
+16^5 = 1 048 576
+
+dec 173 => HEX
+173 / 16 = 10.8125 (10 => A)
+10*16 = 160
+173-160 = 13 = D
+
+	BINARY		HEX	DEC
+LDA 	%10101101 	AD	128+32+8+4+1 = 173	A=10 D=13
+         1010 => 128 + 0 + 32 + 0
+             1101 => 8   + 4 + 0  + 1 
+
+Machine code	Assembly code
+AD 80 03	LDA $0380
+
+AD => Operation Code aka op-code
+   => Occupies 1 BYTE of memory
+
+$0380 => Opperand
+      => Address, 16 Bits long, 2 BYTE of memory
+80 03 => CRUX last BYTE (80) comes first in machine code… and then (03)
+      => Called “Low Byte First” storing address standard in 650x processor.
+
+MACHINE LANGUAGE OP-CODES AND ASSEMBLY MNEMONICS
+LDA => AD	LDX => AE	LDY => AC	BRK => 00
+STA => 8D	STX => 8E	STY => 8C
+
+=====================================================
+==== PROGRAM FÖR ATT BYTA PLATS PÅ 2 VÄRDEN I MINNET
+
+Machine Code	Assembly Code
+(Object Code)	(Source Code)
+- - - - - - 	- - - - - - -
+AD 80 03	LDA $0380	Ladda a-register med värdet på adress $0380
+AE 81 03	LDX $0381	Ladda x-register med värdet på adress $0381
+8D 81 03	STA $0381	Skriv värdet i a-register till adress $0381
+8E 80 03	STX $0380	Skriv värdet i x-register till adress $0380
+00		BRK
+
+Program is 13 BYTE long
+AD 80 03 AE 81 03 8D 81 03 8E 80 03 00
+1  2  3  4  5  6  7  8  9  10 11 12 13
+
+==========================
+== Place program into ram
+
+Address $033C => “Cassette buffer”
+
+   0    3    3    C
+0000 0011 0011 1100
+      768   48   12 = 828	
+
+Put each instruction at a mem location
+
+		Machine Code	Assembly Code
+Address		(Object Code)	(Source Code)
+- - - - - - -	- - - - - - 	- - - - - - -
+033C AD 80 04	AD 80 03	LDA $0380	3 BYTE => 033C=1 033D=2 033E=3 NEXT=>033F
+033F AE 81 03	AE 81 03	LDX $0381	3 BYTE => 033F=1 0340=2 0341=3 NEXT=>0342
+0342 8D 81 03	8D 81 03	STA $0381	3 BYTE => 0342,0343,0344       NEXT=>0345
+0345 8E 80 03	8E 80 03	STX $0380	3 BYTE => 0345,0346,0347       NEXT=>0348
+0348 00		BRK
+
+=================
+== Screen memory
+
+C64 => $0400 and upwards
+
+   0  4      0    0
+0000 0100 0000 0000
+   0 + 1024 + 0 + 0 = 1024
+
+=============
+= Subroutines
+
+JSR => Jump subroutine
+RTS => Return subroutine
+
+* Prewritten subroutines (Kernal subroutines)
+- Stored in ROM
+- KERNAL (K)eyboard (E)ntry (R)ead (N)etwork (A)nd (L)ink
+- KERNAL Operating systemmake screen, keyboard, I/O and control mechanism work together.
+
+Dec	Binary	Address	 Name	
+- - - -|- - - |-- - - -| - - -
+65490		$FFD2	 CHROUT	Output an ASCII char from A-reg to Screen/Disk/Cassette/Tape/Device X
+		$FFE4	 GETIN	Gets an ASCII char
+		$FFE1	 STOP	Checks the RUN/STOP key
+
+ASCII letters
+X = $58				
+RETURN = $0D
+CLS = $93
+A $41	B $42	C $43	D $44	E $45
+F $46	G $47	H $48	I $49	J $4A
+K $4B	L $4C	M $4D	N $4E	O $4F
+P $50	Q $51	R $52	S $53	T $54
+U $55	V $56	W $57	X $58	Y $59
+Z $5A
+
+# => Immediate addressing
+
+LDA #$48 	Load value 48 into A-reg
+JSR $FFD2	Invoke Kernal SubRoutine CHROUT, Print “H” to screen
+
+===============================
+== ASSEMBLE (Supermon command)
+Instead of “hand assembling” use the ASSEMBLE Monitor command (A)
+
+A 033C LDA #$48 => Becomes
+
+A 033C A9 48	LDA #$48
+A 033E
+
+Adding more code
+
+A 033C A9 48	=> LDA #$48	2 BYTES 033C,033D
+A 033E 20 D2 FF => JSR $FFD2	3 BYTES 033E,033F,0340
+A 0341 00       => BRK		1 BYTE  0341
+A 0342
+
+Press enter to quit assembler command
+
+G 033C => Prints “H” where cursor are placed
+
+A 0337 A9 0D	=> LDA #$0D “Return/NewLine”
+A 0339 20 D2 FF => JSR $FFD2 	3 BYTES	0339,033A,033C => CHROUT A-reg “new line”
+A 033C A9 48	=> LDA #$48	2 BYTES 033C,033D
+A 033E 20 D2 FF => JSR $FFD2	3 BYTES 033E,033F,0340 => CHROUT A-reg “H”
+A 0341 A9 49	=> LDA #$48	2 BYTES 0341,0342 
+A 0343 20 D2 FF => JSR $FFD2	3 BYTES 0343,0344,0345 => CHROUT A-reg “I”
+
+G 0337 => Prints HI on a new line
+
+=================================
+== DISASSEMBLE (Supermon command)
+(D) go from code in memory to “Assembly / Source code”
+D 033C
+
+======================
+== Linking with BASIC
+
+Link to machine language program from BASIC
+When machine language program is finished return to BASIC
+
+BASIC => SYS “address” => Go to machine language subroutine at address
+ML    => RTS           => Return to caller
+
+Change BRK to RTS => A 0346 RTS
+List using disassembler => D 0337 0346
+
+A 0337 A9 0D	=> LDA #$0D “Return/NewLine”
+A 0339 20 D2 FF => JSR $FFD2 	3 BYTES	0339,033A,033C => CHROUT “new line”
+A 033C A9 48	=> LDA #$48	2 BYTES 033C,033D
+A 033E 20 D2 FF => JSR $FFD2	3 BYTES 033E,033F,0340 => CHROUT “H”
+A 0341 A9 49	=> LDA #$48	2 BYTES 0341,0342 
+A 0343 20 D2 FF => JSR $FFD2	3 BYTES 0343,0344,0345 => CHROUT “I”
+A 0346 60       => RTS		1 BYTE  0346 => Return to invoker of routine…
+
+
+Type X to exit into BASIC
+
+HEX => 0337
+BIN => 0000 0011 0011 0111
+DEC =>    0  768   48    7 => 823
+
+SYS 823 => Call subroutine at adress 0337 => Print “HI” on new line
+
+To call a subroutine starting at adress 033C
+SYS 828 => Call subroutine at adress 033C
+
+=================
+== LOOPS
+
+a 033C LDX #$00    => 2 BYTES Immediate addressing => value 0 in x-reg, treat X as counter
+a 033E LDA $034A,X => 3 BYTES 033E, 033F, 0340 Load A-reg with value at $034A + x (0-5) 
+		   => $034A + 0 = $034A
+		   => $034A + 1 = $034B
+		   => $034A + 2 = $034C
+		   => $034A + 3 = $034D
+		   => $034A + 4 = $034E
+a 0341 JSR $FFD2   => 3 BYTES 0341, 0342, 0343 => CHROUT value in A-reg
+a 0344 INX         => 1 BYTE INCREMENT VALUE IN X-REG WITH 1
+a 0345 CPX #$06    => 2 BYTES 0345, 0346 => Compare X-reg with value 6
+a 0347 BNE $033E   => 2 BYTES 0347, 0348 => check status reg with latest comparison
+		   => branch to address $033E if X-reg != 6
+a 0349 RTS         => We are done, x are equal to 6, return to invoker of this subroutine
+
+To insert data into memory use the (M) command
+M 034A 034F
+
+Adress	034A 034B 034C 034D 034E
+char	H    E    L    L    O
+Hex	48   45   4C   4C   4F   
+
+SUPERMON COMMAND “x” => return to BASIC
+x => return to BASIC
+
+our program starts at address 033C => 0000 0011 0011 1100 => 828 decimal
+
+SYS 828
+
+To call a subroutine starting at adress 0342
+
+033C 828
+033D 829
+033E 830
+033F 831
+0340 832
+0341 833
+0342 834
+
+SYS 834 => Call subroutine at adress 0342
+
+===================
+== A Stop gap save
+Preserving short programs in BASIC “DATA” statements
+
+1) Get program data out of memory as decimals
+FOR J=828 to 847:PRINT PEEK(J);:NEXT J
+
+2) Outputs the memory in decimal format, our program =)
+162 0 189 74 3 32 210 255 232
+224 6 208 245 96 72 69 76 76 79
+                 H  E  L  L  O
+
+Below doesn’t seem to work might work later on when i look at it…
+50 data 162 0 189 74 3 32 210 255 232
+60 data 224 6 208 245 96 72 69 76 76 79
+80 for j=828 to 847: read x:poke j,x:next j
+100 for j=1 to 3
+110 sys 828
+120 next j
+
+
+#############
+# CHAPTER 3 #
+#############
+
+==============
+= Interrupts
+
+Computer “freezes” 60 times / second => Interrupt processing
+Stops what it is doing
+Switch to a new set of programs
+* Flasing the cursor
+* Checking the keyboard
+* Keep clock up to date
+* cassette motor needs power?
+Finished “unfreezes” and continue what it was doing
+
+=========
+= Flags
+
+650X Reference manual show what flags are affected by which instruction
+
+a 0345 CPX #$06    => 2 BYTES 0345, 0346 => Compare X-reg with value 6
+a 0347 BNE $033E   => 2 BYTES 0347, 0348 => check status reg with latest comparison
+
+CPX and BNE interlinked by flags, that notes if something has happened.
+
+CPX “test” X and set flag to signal how the comparison turned out.
+
+BNE depends on that flag
+
+=> Some instructions leave a trail of status information in the form of flags
+=> Other instructions depend on those flags
+
+Z => Zero 
+  => (The EQUAL flag) CPX,CPY,CMP(the a-reg), Z=1 if comparison is EQUAL
+  => Sometime checks for EQUAL to ZERO => Z will be set to 1 (ex using LDX #$00)
+  => Z-flag set by any activity that may change the data registers X,Y,A
+  => ex LDA, LDX  might change Z flag.
+  => STA, STX, STY does not change any flag including the Z flag.
+
+C => Carry
+  => (The GE Greater/Equal flag) 
+  => Ex) CPX,CPY,CMP, C=1 if X,Y,A is greater or equal to compared value.
+  => C-flag only affected by comparison, arithmetic
+  => BCS, Branch Carry Set   => C=1 => Do branch
+  => BCC, Branch Carry Clear => C=0 => Do branch
+  => SEC, Set Carry
+  => CLC, Clear Carry
+
+N => Negative
+  => (HB, the High Bit)
+  => The N flag is set to indicate that a register has been given a value whose HB is set
+  => Affected by instructions that affects an register ex X,Y,A
+  => Affected by comparison
+  => BMI, Branch Minus, N=1 => Do branch
+  => BPL, Branch Plus,  N=0 => Do branch
+
+V => Overflow
+  => (The SAO flag, the signed arithmetic overflow)
+  => Affected by addition and subtraction instructions.
+  => Meaningfull only if numbers dealt with are concerned to be signed
+  => BIT, Bit Test, V flag signals the condition of bit 6 of the tested memory location.
+  => Z-flag is bit 7, V-flag is bit 6
+  => BIT command primary usage tetst I/O ports on a IA (I)nterface (A)daptor
+  => BVS, Branch Overflow Set,   V=1 => Do branch
+  => BVC, Branch Overflow Clear, V=0 => Do branch
+  => CLV, Clear Overflow, set V to 0
+  => On some 650X chips the V-flag can be set by hardware, there is a pin on that chip
+     that can be used so that an external logic signal will trigger the V-flag
+ 
+=================
+= Singed numbers
+
+   0->+255 unsigned
+-128->+127   signed “Twos complement form”
+
+-1	FF 	1111 1111
+-2   	FE 	1111 1110
+. . .
+-128	80	1000 0000
+
+EX) Load A-reg with value decimal 200, C8, 1100 0000
+LDA #$C8 => As we can se the N flag is set because the first digit is set in “1100 0000”
+
+200 is a negative number, if we want it to be a negative number
+
+Count down from hex 10
+16 $10 0001 0000 HB is NOT set
+15 $0F 0000 1111 HB is NOT set
+14 $0E 0000 1110 HB is NOT set
+13 $0D 0000 1101 HB is NOT set
+12 $0C 0000 1100 HB is NOT set
+11 $0B 0000 1011 HB is NOT set
+10 $0A 0000 1010 HB is NOT set
+ 9 $09 0000 1001 HB is NOT set
+ 8 $08 0000 1000 HB is NOT set
+ 7 $07 0000 0111 HB is NOT set
+ 6 $06 0000 0110 HB is NOT set
+ 5 $05 0000 0101 HB is NOT set
+ 4 $04 0000 0100 HB is NOT set
+ 3 $03 0000 0011 HB is NOT set
+ 2 $02 0000 0010 HB is NOT set
+ 1 $01 0000 0001 HB is NOT set
+ 0 $00 0000 0000 HB is NOT set
+-1 $FF 1111 1111 (-128 +64+32+16+8+4+2+1) HB is set
+-2 $FE 1111 1110 (-128 +64+32+16+8+4+2  ) HB is set
+-3 $FD 1111 1101 (-128 +64+32+16+8+4  +1) HB is set
+-4 $FC 1111 1100 (-128 +64+32+16+8+4    ) HB is set 
+
+================
+= Overflow
+The result is to big to fit!!!
+
+ex) 200 + 200 is 400 and 255 is the largest value that fits into a BYTE…
+1   1  1  1   1 1 1 1
+128+64+32+16 + 8+4+2+1 = 255
+FF
+
+If we are using UNSIGNED numbers C-flag tells us about OVERFLOW
+If we are using   SIGNED numbers V-flag tells us about OVERFLOW
+
+===================
+= More flags
+
+R => shows all registers in supermon
+
+	PC	SR	AC 	XR 	YR 	SP
+;	000A	33	00	06	00	F6
+
+SR => The (S)tatus (R)egister
+SR => HEX 33 => BIN 	0 0 1 1   0 0 1 1
+			N V - B   D I Z C
+			* *           * *
+Bit number		7 6 5 4   3 2 1 0
+
+====================
+= Not testable flags
+
+B => WHEN an INTERRUPT occur, B-flag indicates if a BRK op code caused the INTERRUPT
+D => Decimal mode indicator, ADD/SUBTRACTION behaviour, C64 default to OFF 
+  => SED, set decimal
+  => CLD, clear decimal
+I => Interrupt disable, I-flag disables the interrupt request pin activity
+  => SEI, Set interrupt disable
+  => CLD, Clear interrupt disable
+
+=====================
+= Flag summary table
+
+Bit	| Flag	  Brief		 Activity	 Branch Taken if:
+Number	| Name	  Meaning	 Level		 Set	Not-Set
+- - - -	|- - - -| - - - - - - - | - - - - - - - | - - - - - - - - -
+7 *	| N	| Neg, high bit	| Busy		| BMI	BPL
+6 *	| V	| Signed arithm | Quiet		| BVS	BVC
+	|	| overflow	| 
+5	| -	| Not used	|
+4	| B	| Interrupt	|
+	|	| caused by BRK |
+3	| D	| decimal	|
+2	| I	| Interrupt dis |
+1 *	| Z     | Zero,  n == x	| Buy		| BEQ	BNE
+0 *	| C	| Carry, n >= x	| Quiet		| BCS	BCC
+
+=============
+= Comparison
+
+After for a comparison using for ex CPX,CPY,CMP
+
+BEQ : == : Branch if two BYTES are EQUAL
+BNE : != : Branch if two BYTES are NOT EQUAL
+BCS : >= : reg >= value => Branch if register value are greater than or equal to value
+BCC : <  : reg <  value => Branch if register value are less than
+
+====================
+= Logical Operators
+
+Only works on A-reg, Each bit is treated INDEPENDENT
+
+AND : Logical AND  : turns bits off
+ORA : Logical OR   : turns bits on
+EOR : Exclusive OR : flip  bits over
+
+- - - -
+| AND | 1 => Keep Origin, 0 => Turn Bit OFF
+- - - -
+A-Reg	Mask	Mask Meaning	Result
+0	0	Turn Bit OFF 	0	
+1	0	Turn Bit OFF 	0
+0	1	Keep origin	0	
+1	1	Keep origin	1	
+
+- - - -
+| ORA | 1 => Turn Bit On, 0 => Keep Origin
+- - - -
+A-Reg	Mask	Mask Meaning	Result
+0	0	Keep origin	0
+1	0	Keep origin	1
+0	1	Turn Bit ON	1
+1	1	Turn Bit ON	1
+
+- - - -
+| EOR | 1 => Flip bit, 0 => Keep Origin
+- - - -
+A-Reg	Mask	Mask Meaning	Result
+0	0	Keep origin	0
+1	0	Keep origin	1
+0	1	Flip Bit	1
+1	1	Flip Bit	0
+
+================================
+= When to use LOGICAL operators?
+
+AND, ORA, EOR used when dealing with 
+
+1) IA controlling external devices.
+
+2) Code Translation
+
+Examples)
+
+5:ASCII 0011 0101 : Used for input or output to scrren the ASCII char “5”
+5:Bin	0000 0101 : Use the VALUE 5 when doing arithmetics
+
+ASCII   0011 0101 => Convert this ASCII 5 char to its binary value
+  AND   1100 1111 => Keep value of bits that we have masked with 1
+RESULT  0000 0101 => 5 binary / decimal value to be used in arithmetic
+
+BINARY  0000 0101 => Convert this binary value 5 to ascii
+   ORA  0011 0000 => Turn bits on that are masked with 1, 0 keep original
+RESULT  0011 0101 => The ascii 5 char
+
+==============================
+= INPUT: The GETIN Subroutine
+
+* Prewritten subroutines (Kernal subroutines)
+- Stored in ROM
+- KERNAL (K)eyboard (E)ntry (R)ead (N)etwork (A)nd (L)ink
+- KERNAL Operating systemmake screen, keyboard, I/O and control mechanism work together.
+
+Address	 Name	
+- - - -  - - -
+$FFD2	 CHROUT	Output an ASCII char from A-reg to Screen/Disk/Cassette/Tape/Device X
+$FFE4	 GETIN	Gets an ASCII char
+$FFE1	 STOP	Checks the RUN/STOP key
+
+- - - - -
+| GETIN |
+- - - - -
++ $FFE4
++ Gets an ASCII char from the keyboard buffer
++ Input is taken from the keyboard buffer NOT the screen
++ If a key is HELD DOWN => Still only one detection
++ This subroutine returns immediately
++ If no key is found, a binary zero is returned in A-reg
++ If a key is found, its ASCII value will be in A
++ Special keys RETURN, RVS, color codes will also be detected (What???)
+
+OBS: A JSR to $FFE4 does not guarantee that X-reg and Y-reg values are the same as before.
+
+OBS: Does not wait for a key to be pressed, just looks in the buffer if it has been.
+
+OBS: If we want the keyboard input to appear on screen we should follow a call to 
+GETIN with a call to CHROUT.
+
+
+=================
+= STOP
+
+Machine language programs ignore the RUN/STOP button (unless the program itself does not check for it.
+
+- - - - -
+| STOP |
+- - - - -
++ $FFE1
++ Checks the run/stop key at that very moment
++ BEQ branch to “EXIT” should follow a STOP so that program is terminated
++ Useful to have in code while one is TESTING the code
+
+OBS - To make the key operational it must be called frequently…
+
++ SR-register flag Z signals when RUN/STOP is being pressed, bit number 1 => XXX XX(1)X
+
+#######################
+# Programming project #
+#######################
+
+BEQ : == : Branch if two BYTES are EQUAL
+BNE : != : Branch if two BYTES are NOT EQUAL
+BCS : >= : reg >= value => Branch if register value are greater than or equal to value
+BCC : < : reg < value => Branch if register value are less than to value
+
+Numeric KEYs, RUN/STOP
+Numeric key => Echo to screen
+
+ASCII TABLE page 215
+/ : $2F   
+0 : $30	: 0011 0000
+1 : $31 : 0011 0001
+2 : $32 : 0011 0010
+3 : $33 : 0011 0011
+4 : $34 : 0011 0100
+5 : $35 : 0011 0101
+6 : $36 : 0011 0110
+7 : $37 : 0011 0111
+8 : $38 : 0011 1000
+9 : $39 : 0011 1001
+
+as we se the 4 most highbits are the same for 0-9 in ascii and the low 4 is the actual value of the ASCII char…. cool
+
+.a 033c jsr $ffe1	=> check RUN/STOP key, 3 BYTES 033C, 033D, 033E
+.a 033f BEQ !!!! $0351, => 2 BYTES 033F, 0340
+.a 0341 jsr $ffe4	=> GETIN, sets ASCII char in A-reg, or 0 in A-reg if not found
+.a 0344 cmp #$30	=> Compare value in A-reg with ascii “0” aka #$30 (immediate addr)
+.a 0346	BCC $033c	=> Branch if A-reg was < #$30, then branch to $033C
+.a 0348 cmp #$3A	=> Compare value in A-reg is larger than dec 40 => hex 3A
+.a 034a BCS $033c	=> Branch back to input reading if larger or equal
+
+// We now have an ascii char i A-reg, lets print char to screen
+// $FFD2 : CHROUT : Output an ASCII char from A-reg to Screen/Disk/Cassette/Tape/Device X
+
+.a 034c jsr $ffd2	=> Jump to kernel subroutine CHROUT to print to screen from A-reg
+
+// convert ascii to binary, turn HIGH bits off using AND
+
+.a 034f AND #$0F 	=> 0F = 0000 1111  (Just for fun has nothin to do with routine)
+			   Performs a logical AND to shut down the 4 high bits and keep the 4 low
+.a 0351 RTS		=>
+
+###########################
+## Questions and Projects #
+###########################
+
+Project enthusiasts
+
+1) Rewrite so to use ALPHA chars #$41 to #$5A
+
+2) Write extra coding to allow both numeric (#$30 to #$39) and alpha (#$41 to #$5A)
+
+BEQ : == : Branch if two BYTES are EQUAL
+BNE : != : Branch if two BYTES are NOT EQUAL
+BCS : >= : reg >= value => Branch if register value are greater than or equal to value
+BCC : < : reg < value => Branch if register value are less than value
+
+.a 033c jsr $ffe1	=> check RUN/STOP key, 3 BYTES 033C, 033D, 033E
+.a 033f BEQ !!!! $0359, => 2 BYTES 033F, 0340
+.a 0341 jsr $ffe4	=> GETIN, sets ASCII char in A-reg, or 0 in A-reg if not found
+.a 0344 cmp #$30	=> Compare value in A-reg with ascii “0” aka #$30 (immediate addr)
+.a 0346	BCC $033c	=> Branch if A-reg was < #$30, then branch to $033C
+.a 0348 cmp #$3A	=> Compare value in A-reg is larger than dec 40 => hex 3A
+.a 034a BC(C) $0354	=> Branch forward to CHROUT command because we found 0-9
+
+.a 034c cmp #$41	=> Compare value in A-reg with ascii “A” aka #$41 (immidiate adds)
+.a 034e BCC $033c	=> Start over from $033c if value < #$41
+.a 0350 cmp #$5B	=> Do a comparison again with char value for “Z”
+.a 0352 BCS $033c	=> Start over from $033c if value >= “Z” hmmmm
+
+.a 0354 jsr $ffd2	=> Jump to kernel subroutine CHROUT to print to screen from A-reg
+.a 0357 RTS
+
+ASCII CHAR TABLE page 215
+
++ : $2B :           : 43
+´ : $2C :           : 44
+- : $2D :           : 45
+  : $2E :           : 46
+/ : $2F :           : 47
+0 : $30	: 0011 0000 : 48
+1 : $31 : 0011 0001 : 49
+2 : $32 : 0011 0010 : 50
+3 : $33 : 0011 0011 : 51
+4 : $34 : 0011 0100 : 52
+5 : $35 : 0011 0101 : 53
+6 : $36 : 0011 0110 : 54
+7 : $37 : 0011 0111 : 55
+8 : $38 : 0011 1000 : 56
+9 : $39 : 0011 1001 : 57
+: : $3A : 0011 1010 : 58
+; : $3B : 0011 1011 : 59
+< : $3C :           : 60
+= : $3D :           : 61
+> : $3E :           : 62
+? : $3F :           : 63
+@ : $40 : 0100 0000 : 64
+A : $41 : 0100 0001 : 65 = 64 + 1
+B : $42 : 0100 0010 : 66
+C : $43 : 01        : 67
+D : $44 : 01        : 68
+E : $45 : 01        : 69
+F : $46 :           : 70
+G : $47 :           : 71
+H : $48 :           : 72
+I : $49 :           : 73
+J : $4A :           : 74
+K : $4B :           : 75
+L : $4C :           : 76
+M : $4D :           : 77
+N : $4E :           : 78
+O : $4F :           : 79
+P : $50 :           : 80
+Q : $51 :           : 81
+R : $52 :           : 82
+S : $53 :           : 83
+T : $54 :           : 84
+U : $55 :           : 85
+V : $56 :           : 86
+W : $57 :           : 87
+X : $58 :           : 88
+Y : $59 :           : 89
+Z : $5A : 0101 1010 : 90 = 64 + 16 + 8 + 2
+[ : $5B :           : 91
+
+#############
+# CHAPTER 4 #
+#############
+
+Numbers Arithmetic and Subroutines,
+It makes no difference to the computer, its up to you to handle them numbers as signed or not…
+
+===============================
+= Numbers: Signed and Unsigned
+
+Signed -128 to +127, at most significant bit in byte 1 = neg / 0 = positive
+
+(-128) 1 1 1 …     1 0 0 0 0 … 0
+(+ 64) 0 0 0 …     1 0 0 0 0 … 1
+(+ 32) 0 0 0 …     1 0 0 0 0 … 1
+(+ 16) 0 0 0 …     1 0 0 0 0 … 1
+(+  8) 0 0 0 …     1 0 0 0 0 … 1
+(+  4) 0 0 0 …     1 0 0 0 0 … 1
+(+  2) 0 0 1 …     1 0 0 1 1 … 1
+(+  1) 0 1 0 …     1 0 1 0 1 … 1 
+
+-128,-127,-126,…, -1,0,1,2,3,…, 127  
+
+============================
+= Big Numbers Multiple bytes
+
+When expressing numbers with multiple bytes, and they are thought of as signed,
+only the highest bytes highest bit is the sign bit.
+
+        | unsigned  | signed 
+- - - - | - - - - - | - - - - - - - - -
+1 byte  | 0-255     |     -128 to +127
+2 bytes | 0-65535   |   -32768 to +32767
+3 bytes | 0-16777212| -8388608 to +8388607
+4 bytes | 0-4billion| -2billion to +2billion
+
+===========
+= Addition
+
+1) CLC Set carry (C-flag) bit to 0
+2) Addition takes place in A-reg
+   If multiple byte numbers are used start at the lowest bytes adding them together.
+   The carry flag will be set if the number becomes to big to store in one byte.
+   Continue on with next bytes until all are added.
+3) If number is thought of as 
+
+	UNSIGNED C-flag==1 indicates overflow
+	  SIGNED V-flag==1 indicates overflow
+
+4) BCS if overflow to other subroutine handling the error perhaps
+   
+==============
+= Subtraction
+
+“UpSideDown” addition
+
+C-flag, now called “Inverted borrow”
+
+1) SEC Set C-flag to 1
+
+2) Subtraction takes place in A-reg, byte per byte as in addition
+
+3) If number is thought of as 
+
+	UNSIGNED C-flag==0 indicates overflow
+	  SIGNED V-flag==1 indicates overflow
+
+===================
+= Comparing numbers
+
+CMP => Compare A-reg
+CPX => Compare X-reg
+CPY => Compare Y-reg
+
+Then after using CMP, CPX or CPY check C-flag
+
+BUT you can use subtraction!!!!!!!
+
+Subtract one number from the other 
+
+ex) N1 - N2 = N3
+
+    If C-flag==1
+
+	Then N1 > N2 OR N1 == N2
+	WHY? => The subtraction was legal, we did not have to use the extra carry bit
+
+    IF C-flag==0
+
+	Then N1 <  N2
+	“HY => The subtraction generated a negative number, which can not be represented in Unsigned arithmetic
+
+==================================
+= Left shift, multiplication by 2
+
+Dec	Bin
+100	%0110 0100
+200	%1100 1000
+
+Conclusion to double the number move each BIT a position to the left and fill with 0 from the right
+
+=> ASL: Arithmetic Shift Left
+
+	* The left most bit is moved to the Carry, C-flag
+		- 0 to carry ok
+		- 1 to carry… OVERFLOW
+
+Multiple bytes
+
+=> ROL: Rotate Left
+
+	* The current value of Carry, C-flag 0 or 1 is pushed into the right most bit
+	* The left most bit is moved to the Carry
+	=> We can hook together 2 Bytes
+
+		1) CLC Clear Carry to set it to 0 
+		BYTE-1   BYTE-2
+		01001000 11001000
+			 ROL BYTE 2
+		         (1)1001000(0) The previous carry
+			  |
+			  |_New Carry
+
+		ROL BYTE-1
+		(0)100100(1)- Carry brought from previous ROL
+                 |
+		 |_New Carry (great we did not get overflow… because a ZERO was pushed into the C-flag)
+
+=================
+= Multiplication
+
+Multiplication by using “Multiply by 2”
+
+Multiply by 4 => “Multiply by 2” TWICE
+
+Multiply by 8 => “Multiply by 2” THREE TIMES
+
+Multiply by 10 => “Multiply by 2” TWICE, ADD Original number, “Multiply by 2”
+
+==========================================
+= Dividing by two, Right Shift and Rotate
+
+Move the bits the other way around compared with mult by 2.
+
+LSR = Logical Shift Right
+
+	* Puts ZERO into the left most bit
+	* Move other bits to left one step
+	* The right most bit falls in to C-flag, the Carry
+
+ROR = Rotate Right
+
+	* Puts Carry-bit C-flag bit, into the rightmost bit
+	* moves other bits to the right
+	* The right most bit falls into carry
+
+The final carry bit at the end of right shifting might be considered the “Remainder” after dividing
+
+===============================
+= Comments on Shift and rotate
+SHIFT and ROTATE instruction operates on A-reg and directly on memory addresses.
+
+Book states this when it comes to “Logical” VS “Arithmetic”
+Logical    => Sign of a number will probably be lost if the num was intended to be signed.
+Arithmetic => Sign will probably be resereved
+
+==============
+= The Project
+
+.a 033c jsr $ffe1	=> check RUN/STOP key, 3 BYTES 033C, 033D, 033E
+.a 033f BEQ $0351	=> 2 BYTES 033F, 0340 Branch to our RTS statement bellow if Runstop key was pressed
+.a 0341 jsr $ffe4	=> GETIN, sets ASCII char in A-reg, or 0 in A-reg if not found
+.a 0344 cmp #$30	=> Compare value in A-reg with ascii “0” aka #$30 (immediate addr)
+.a 0346	BCC $033c	=> Branch if A-reg was < #$30, then branch to $033C
+.a 0348 cmp #$3A	=> Compare value in A-reg is larger than dec 40 => hex 3A (char after “9”)
+.a 034a BCS $033c	=> Branch back to input reading if larger or equal
+
+// We now have an ascii char i A-reg, lets print char to screen
+// $FFD2 : CHROUT : Output an ASCII char from A-reg to Screen/Disk/Cassette/Tape/Device X
+
+.a 034c jsr $ffd2	=> Jump to kernel subroutine CHROUT to print to screen from A-reg
+
+// convert ascii to binary, turn HIGH bits off using AND
+
+.a 034f AND #$0F 	=> 0F = 0000 1111  (Just for fun has nothin to do with routine)
+			   Performs a logical AND to shut down the 4 high bits and keep the 4 low
+.a 0351 RTS		=>
+
+************************
+*** Addition program ***
+************************
+
+.a 0352 JSR $033C => Jump to routine above starting at $033C, read 0-9 char and put into A-reg
+.a 0355 STA $03C0 => Store the value in A-reg at addr  $03C0
+.a 0358 LDA #$2B  => Store the char “+” in A-reg
+.a 035A JSR $FFD2 => Print value in A-reg to screen
+.a 035D JSR $033C => Jump to input reading subroutine again. and get a new figure
+
+.a 0360 TAX       => Copy value in A-reg to X-reg
+.a 0361 LDA #$3D  => Store the value of “=“ at A-reg
+.a 0363 JSR $FFD2 => jsr to chrout to put “=“ char at screen
+
+.a 0366 TXA       => copy back the second input digit into a-reg
+.a 0367 CLC       => Clear cary, set it to 0, remember addition put into carry if addition to big
+.a 0368 ADC $03C0 => Addition, with value in A-reg and value at adds $033C
+                  => we now have the sum in the A-reg of the addition
+                  => The value is in BINARY FORM we have to transform it to decimal!
+		  => if result is < 9 we can use ORA
+
+.a 036B ORA #$30  =>    A: xxxx xxxx
+                     #$30: 0011 0000
+		      $30: 0011 0000 : 48 dec : char “0”
+
+			If we look at char ascii table we we see that the 0-9 all starts with 0011 xxxx
+			So I guess the ORA here is just to make sure the result in a-reg is mimicing
+			this layout of 0s and 1s. And if we only allow us to add numbers that in total
+			will just become at a max 9 this transformation with ORA will make the result
+			be a char that we can output to the screen directly…
+			“0” : $30 : 0011 0000
+			“1” : $31 : 0011 0001
+			“2” : $32 : 0011 0010
+			“3” : $33 : 0011 0011
+			“4” : $34 : 0011 0100
+			“5” : $35 : 0011 0101
+			“6” : $36 : 0011 0110
+			“7” : $37 : 0011 0111
+			“8” : $38 : 0011 1000
+			“9” : $39 : 0011 1001
+
+.a 036D JSR $FFD2 => ptrint to screen the transformed value
+.a 0370 RTS       => return to invoker…
+
+supermon command x => return to BASIC
+
+Run the program from BASIC with “sys 850”
+
+DEC 850
+BIN xxxx xxxx xxxx xxxx
+    0000 0011 0101 0010 
+DEC       768   80    2
+HEX     0   3    5    2 => and it is at adress $0352 our program starts
+1) 850 - 768 = 82
+2)  82 -  80 =  2
+3)   2 -   2 =  0
+
+
+ASCII CHAR TABLE page 215
+
++ : $2B :           : 43
+´ : $2C :           : 44
+- : $2D :           : 45
+  : $2E :           : 46
+/ : $2F :           : 47
+0 : $30	: 0011 0000 : 48
+1 : $31 : 0011 0001 : 49
+2 : $32 : 0011 0010 : 50
+3 : $33 : 0011 0011 : 51
+4 : $34 : 0011 0100 : 52
+5 : $35 : 0011 0101 : 53
+6 : $36 : 0011 0110 : 54
+7 : $37 : 0011 0111 : 55
+8 : $38 : 0011 1000 : 56
+9 : $39 : 0011 1001 : 57
+: : $3A : 0011 1010 : 58
+; : $3B : 0011 1011 : 59
+< : $3C :           : 60
+= : $3D :           : 61
+> : $3E :           : 62
+? : $3F :           : 63
+@ : $40 : 0100 0000 : 64
+A : $41 : 0100 0001 : 65 = 64 + 1
+B : $42 : 0100 0010 : 66
+C : $43 : 01        : 67
+D : $44 : 01        : 68
+E : $45 : 01        : 69
+F : $46 :           : 70
+G : $47 :           : 71
+H : $48 :           : 72
+I : $49 :           : 73
+J : $4A :           : 74
+K : $4B :           : 75
+L : $4C :           : 76
+M : $4D :           : 77
+N : $4E :           : 78
+O : $4F :           : 79
+P : $50 :           : 80
+Q : $51 :           : 81
+R : $52 :           : 82
+S : $53 :           : 83
+T : $54 :           : 84
+U : $55 :           : 85
+V : $56 :           : 86
+W : $57 :           : 87
+X : $58 :           : 88
+Y : $59 :           : 89
+Z : $5A : 0101 1010 : 90 = 64 + 16 + 8 + 2
+[ : $5B :           : 91
