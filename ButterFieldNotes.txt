@@ -371,7 +371,7 @@ If we are using   SIGNED numbers V-flag tells us about OVERFLOW
 ===================
 = More flags
 
-R => shows all registers in supermon
+(Supermon command) (R) => shows all registers in supermon
 
 	PC	SR	AC 	XR 	YR 	SP
 ;	000A	33	00	06	00	F6
