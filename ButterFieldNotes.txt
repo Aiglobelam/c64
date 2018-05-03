@@ -200,14 +200,14 @@ a 0347 BNE $033E   => 2 BYTES 0347, 0348 => check status reg with latest compari
 		   => branch to address $033E if X-reg != 6
 a 0349 RTS         => We are done, x are equal to 6, return to invoker of this subroutine
 
-To insert data into memory use the (M) command
-M 034A 034F
+To insert data into memory use the (Supermon command) (M) command
+M 034A 034F => List memory content, move cursor type in new value, press enter to "save"
 
 Adress	034A 034B 034C 034D 034E
 char	H    E    L    L    O
 Hex	48   45   4C   4C   4F   
 
-SUPERMON COMMAND “x” => return to BASIC
+(Supermon command) “x” => return to BASIC
 x => return to BASIC
 
 our program starts at address 033C => 0000 0011 0011 1100 => 828 decimal
