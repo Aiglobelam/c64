@@ -461,7 +461,7 @@ A-Reg	Mask	Mask Meaning	Result
 
 AND, ORA, EOR used when dealing with 
 
-1) IA controlling external devices.
+1) IA (I)nterface (A)daptor controlling external devices.
 
 2) Code Translation
 
