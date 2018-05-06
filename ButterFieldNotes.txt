@@ -593,10 +593,21 @@ BCC : < : reg < value => Branch if register value are less than value
 .a 033c jsr $ffe1	=> check RUN/STOP key, 3 BYTES 033C, 033D, 033E
 .a 033f BEQ !!!! $0359, => 2 BYTES 033F, 0340
 .a 0341 jsr $ffe4	=> GETIN, sets ASCII char in A-reg, or 0 in A-reg if not found
-.a 0344 cmp #$30	=> Compare value in A-reg with ascii “0” aka #$30 (immediate addr)
-.a 0346	BCC $033c	=> Branch if A-reg was < #$30, then branch to $033C
-.a 0348 cmp #$3A	=> Compare value in A-reg is larger than dec 40 => hex 3A
-.a 034a BC(C) $0354	=> Branch forward to CHROUT command because we found 0-9
+
+.a 0344 cmp #$30	=> Compare A-reg value with ascii “0” aka #$30 (immediate addr)
+                           If A-reg value is            equal to #$30 => SR z-flag (zero flag)  is set to 1
+			   If A-reg value is greater or equal to #$30 => SR c-flag (carry flag) is set to 1
+			   
+.a 0346	BCC $033c	=> BCC, Branch Carry Clear. If c-flag = 0 Do branch
+                           If A-reg was < #$30, then branch to begining of program $033C else continue
+			   
+.a 0348 cmp #$3A	=> Compare value in A-reg is greater or equal #$3A decimal 58 ":" char after "9"
+                           If we got a char on or after ":" c-flag is set to 1
+			   
+.a 034a BCC $0354	=> BCC, Branch Carry Clear. If c-flag = 0 Do branch
+                           If we have a 0 in c-flag it means that we got something in a-reg less than ":"
+                           Branch forward to CHROUT command to print to screen because we found 0-9
+			   Else continue to search for "alpha letters"
 
 .a 034c cmp #$41	=> Compare value in A-reg with ascii “A” aka #$41 (immidiate adds)
 .a 034e BCC $033c	=> Start over from $033c if value < #$41
