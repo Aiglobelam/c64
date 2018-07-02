@@ -981,4 +981,19 @@ TODO: ...
 
 Address modes
 
+Computer instruction => "op code" && "address/operand"
 
+Address mode => In which way does an instruction obtain information
+
+13 address modes in 650x microprocessor
+
+1: "Implied accumulator" => No memory address (Implied = underförstådd)
+2: "Immidiate            => No address, but a value supplied
+3: "Absolute zero page"  => An address designate a single mem location
+4: "absolute,x;"         => An indexed address designating a range of 256 locations
+   "absolute,y"
+   "zero-page,x"
+   "xero-page,y"
+5: "Indirect"            => A location in which the real 2byte jump address may be found
+6: "Relative"            => An offset value used for branch instructions (eg forward 9 back 17)
+7: "COMBO"               => Combination of 5&4 or 4&5, to reach mem anywhere
