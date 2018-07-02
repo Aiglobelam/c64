@@ -966,3 +966,19 @@ X : $58 :           : 88
 Y : $59 :           : 89
 Z : $5A : 0101 1010 : 90 = 64 + 16 + 8 + 2
 [ : $5B :           : 91
+
+###########################
+## Questions and Projects #
+###########################
+
+Write a program to subtract two single-digit numbers.
+
+TODO: ...
+
+#############
+# CHAPTER 5 #
+#############
+
+Address modes
+
+
