@@ -1,5 +1,20 @@
 My notes for Machine Language for the Commodore 64 and other Commodore computers by Jim Butterfield
 
+MLM = Machine Language Monitor
+Supermon by Jim Butterfield => "MLM generator"
+Instructions:
+
+	R => Display / Change registers
+	M => Display / Change memory
+	S => Save memory to disk or tape
+	L => Load from disk or tape
+	G => Go to an machine language program
+	X => Exit to basic
+	A => Assemble
+	D => Disassemble
+	F => Fill memory with fixed contents
+	H => Hunts for a memory pattern
+	T => Transfers a block of memory to a new location
 
 page 14: START MLM => SYS 8
 
