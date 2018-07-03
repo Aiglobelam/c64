@@ -1048,3 +1048,5 @@ Address mode => In which way does an instruction obtain information
        BECAUSE => Even though $E0 + $50 = 130, this will be trimmed to 30 and then 00 infront give $0030
        
 8) Relative Address Mode - Branching
+   Branch forward/backward a certain number of bytes from this point.
+   
