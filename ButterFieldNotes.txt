@@ -1002,13 +1002,49 @@ Address mode => In which way does an instruction obtain information
 
 13 address modes in 650x microprocessor
 
-1: "Implied accumulator" => No memory address (Implied = underförstådd)
-2: "Immidiate            => No address, but a value supplied
-3: "Absolute zero page"  => An address designate a single mem location
-4: "absolute,x;"         => An indexed address designating a range of 256 locations
-   "absolute,y"
-   "zero-page,x"
-   "xero-page,y"
-5: "Indirect"            => A location in which the real 2byte jump address may be found
-6: "Relative"            => An offset value used for branch instructions (eg forward 9 back 17)
-7: "COMBO"               => Combination of 5&4 or 4&5, to reach mem anywhere
+1) Implied Mode
+   Needs no address, occupy only 1 byte in memory
+   Ex) INX, BRK, TAY
+   Ex) NOP, does nothing
+   
+2) Accumulator Mode
+   Allow data manipulation in A-reg or memory without using address
+   Using ASL, ROL, LSR, ROR
+   Ex) ASL A (Accumulator Mode Addressing)
+   Ex) ASL $0380 => NO NO NO this is not No Address Accumulator mode, here address is used.
+   
+3) Immediate Mode
+   Ex) LDA #$38, Load register A with the value of $38, occupy 2bits in mem.
+   
+4) Absolute Mode
+   Ex) JSR $03C0, go to address...
+
+5) Zero-Page Mode
+   All addresses from $0000 to $00FF
+   Popular "Hard to find"
+   Occupy less space and run slightly faster
+   Often usefull information can be found at Zero-Paged addresses
+   User holding down a key => $CB that is $00CB
+   EX) LDA $90 instead of LDA $0090
+   EX) LDA $F3 instead of LDA $00F3
+   
+6) Indexed Mode - Absolute
+   - Give an absolute address and then indicate that the contents of X or Y 
+     should be added to this address to give an "effective address"
+   - Used only for data handling
+   - Can reach up to 256 locations
+   - Can be used to create loops
+   Ex) LDA $034A,X => 3 BYTES 033E, 033F, 0340 Load A-reg with value at $034A + value at x-reg
+
+7) Indexed Mode - Zero-Page
+   Ex) LDA $E0,X (If X contains 50, the effective adddress will be $0030) WHAAAT!?!?!?
+       
+         $E0 hex =       1110 0000 binary = 224 decimal
+       + $50 hex =       0101 0000 binary =  80 decimal
+       -----------------------------------------------
+       = $130 hex = 0001 0011 0000 binary = 304 decimal
+       		     256 32+16
+       
+       BECAUSE => Even though $E0 + $50 = 130, this will be trimmed to 30 and then 00 infront give $0030
+       
+8) Relative Address Mode - Branching
