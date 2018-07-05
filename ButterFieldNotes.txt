@@ -1043,10 +1043,43 @@ Address mode => In which way does an instruction obtain information
        + $50 hex =       0101 0000 binary =  80 decimal
        -----------------------------------------------
        = $130 hex = 0001 0011 0000 binary = 304 decimal
-       		     256 32+16
+       		    256 + 32+16 =304 decimal
        
        BECAUSE => Even though $E0 + $50 = 130, this will be trimmed to 30 and then 00 infront give $0030
        
 8) Relative Address Mode - Branching
-   Branch forward/backward a certain number of bytes from this point.
+   Branching... assembler allow us to enter the actual addresss to which we want to branch
+   Ex) BEQ $033C branch on equal to address $033C
+   This is actually translated into a diffrent form of addressing... WHAT!!!!!???
+   RELATIVE ADDRESS
+   Translated to: Branch forward/backward a certain number of bytes from this point.
+   How many steps/bytes to take is calculated like this: PC address - Target address
+   1) PC current address, in this case $0343 (location after branch BEQ $033C instruction) (Hmmm not 0344?, 3 byte inst?)
+   2) Subtract => $0341 - $033C = -7 decimal => hex signed $F9, (A-F 7 steps)
+   	-7 $033C
+	-6 $033D
+	-5 $033E
+	-4 $033F
+	-3 $0340
+	-2 $0341 BEQ $033C (isnt this a 3byte instruction?)
+	-1 $0342
+	 0 $0343
+
+    CRUX
+    In this case it worked well, just 7 steps...
+    But in reality just 128 backwards and 127 forward steps can be made.
+    
+    Jens note: So I guess this one must have in mind when using branch instruciton? Not clear in text in book...?!?!?
+    
+    Instuction JMP can take you longer, to the exact address specified, JMP $65AC
+    
+9) Indirect Addressing Mode, ROM Link, JMP indirect
+
+   Ex) JMP($1234) Which means that address $1234 will contain which address to actually jump to
    
+   Within ROM, Read Only Memory, In ROM there exist indirect jmp's to addresses stored in RAM, Random Access Memory
+   
+   Ex) C64 => RAM $0314 Associated with interrupt sequences in ROM, so writing to $0341 we can fiddle with that.
+   
+10) 
+  
