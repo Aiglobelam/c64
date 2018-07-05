@@ -1121,7 +1121,39 @@ Address mode => In which way does an instruction obtain information
 ## Questions and Projects #
 ###########################
 
-Screen Manipulation
+MLM = Machine Language Monitor
+Supermon by Jim Butterfield => "MLM generator"
+Instructions:
 
+	R => Display / Change registers
+	M => Display / Change memory
+	S => Save memory to disk or tape
+	L => Load from disk or tape
+	G => Go to an machine language program
+	X => Exit to basic
+	A => Assemble
+	D => Disassemble
+	F => Fill memory with fixed contents
+	H => Hunts for a memory pattern
+	T => Transfers a block of memory to a new location
+	
+Project / Task : "Screen Manipulation"
 
-  
+   0                   10                  20                  30                40
+   |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+0  |0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|
+   |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+1  |0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|
+   |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+2  |0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|
+    . . .
+25 |0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|
+
+40 columns => 20 + 20 => HEX $14 + $14
+                      => HEX $1F(31) + $09
+		      => HEX $28
+		      
+   A 033C LDA #$28  => Load value decimal 40 into A-reg, representing 40 columns screen, "Line length"
+   A 033E LDX $0288 => Screen mem c64 starts at what value exist at address $0288
+   A 0341 STA $03A0 => Save value in A-reg at mem location $03A0
+   A 0344 STX $BC   => Save value in X-reg at zero-page $BC
