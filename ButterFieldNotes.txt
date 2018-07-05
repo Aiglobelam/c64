@@ -1081,5 +1081,24 @@ Address mode => In which way does an instruction obtain information
    
    Ex) C64 => RAM $0314 Associated with interrupt sequences in ROM, so writing to $0341 we can fiddle with that.
    
-10) 
+10) Indirect ,Indexed Mode AKA Indirect Addressing Mode with Index
+    Indirect get data from anywhere, thouhg Index can only reach 256 bytes
+    CRUX
+    1 - Indirect address must be in ZERO-PAGE 2 bytes
+    2 - Y-reg will be used to form the final address together with the Indirect address real address
+    Ex) LDA($C0), Y
+     
+        $00C0 = $11 (Byte 1)
+    	$00C1 = $22 (Byte 2)
+    	Y-reg = 3
+    	
+    	$00C0 -> $00C1 "Low byte first" => $2211 is the address
+    	Then add Y-reg value 3 to that =>  $2214
+    
+    Example usage: Manipulate computer screen
+    We use the Y register to scan throug 256 bytes of data chunks, then we change the indirect address
+    to point some where else and scan 256 bytes again...
+
+11) 
+    
   
