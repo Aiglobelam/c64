@@ -1157,12 +1157,25 @@ Project / Task : "Screen Manipulation"
    A 033C LDA #$28  => Load value decimal 40 into A-reg, representing 40 columns screen, "Line length"
    A 033E LDX $0288 => Screen mem c64 starts at what value exist at address $0288
    A 0341 STA $03A0 => Save value in A-reg (#$28 dec 40) at mem location $03A0
-   A 0344 STX $BC   => Save value in X-reg (whats at pos $0288) at zero-page $BC, the LOW-BYTE
+   A 0344 STX $BC   => Save value in X-reg (whats at pos $0288) 
+                       We are using "zero page addressing" see 5)
+		       All addresses from $0000 to $00FF
+		       $BC =====> HIGH BYTE
                        Why at a zero page?
 		       We are going to use indirect address, and that needs 2 bytes at a zero-page, see 10)
 		       "Low byte first" $BC contains whats at pos $0288
-   A 0346 LDA #$00  => Here comes byte number two, the HIGH-BYTE
-   A 0348 STA $BB      Save the value in the A-reg to zero-page $BB
-                       $BB: #$00  LOW  BYTE
-		       $BC: $0288 HIGH BYTE (the screen address)
-		       Will together form the
+   A 0346 LDA #$00  => Here comes byte number two
+   A 0348 STA $BB      $BB ======> LOW BYTE
+   
+                      ??? $BB = $00   (Byte 1) LOW  BYTE,               $00 => bin 0000 0000
+    	              ??? $BC = $0288 (Byte 2) HIGH BYTE, at $0288 is a $04 => bin 0000 0100
+    	
+		       Remember low byte first, stored in memory in C64
+		       ex) "LDA $0288" => in mem "AE 88 02"
+                       ex) "STA $03A0" => in mem "8D A0 03"
+		       The low byte is the byte that is read first, in these cases 88 and A0 event though
+		       they are the second byte of the address..
+    A 034A LDX #$00 => 
+    A 034C LDY #$04 => 
+    A 034E LDA ($BB), Y => Indirect Indexed addressing
+                           
