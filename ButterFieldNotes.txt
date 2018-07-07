@@ -1088,7 +1088,7 @@ Address mode => In which way does an instruction obtain information
    2 - Y-reg will be used to form the final address together with the Indirect address real address
    Ex) LDA($C0), Y
      
-        $00C0 = $11 (Byte 1)
+        $00C0 = $11 (Byte 1) 
     	$00C1 = $22 (Byte 2)
     	Y-reg = 3
     	
@@ -1139,6 +1139,7 @@ Instructions:
 	
 Project / Task : "Screen Manipulation"
 
+   $0288
    0                   10                  20                  30                40
    |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
 0  |0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|
@@ -1155,5 +1156,13 @@ Project / Task : "Screen Manipulation"
 		      
    A 033C LDA #$28  => Load value decimal 40 into A-reg, representing 40 columns screen, "Line length"
    A 033E LDX $0288 => Screen mem c64 starts at what value exist at address $0288
-   A 0341 STA $03A0 => Save value in A-reg at mem location $03A0
-   A 0344 STX $BC   => Save value in X-reg at zero-page $BC
+   A 0341 STA $03A0 => Save value in A-reg (#$28 dec 40) at mem location $03A0
+   A 0344 STX $BC   => Save value in X-reg (whats at pos $0288) at zero-page $BC, the LOW-BYTE
+                       Why at a zero page?
+		       We are going to use indirect address, and that needs 2 bytes at a zero-page, see 10)
+		       "Low byte first" $BC contains whats at pos $0288
+   A 0346 LDA #$00  => Here comes byte number two, the HIGH-BYTE
+   A 0348 STA $BB      Save the value in the A-reg to zero-page $BB
+                       $BB: #$00  LOW  BYTE
+		       $BC: $0288 HIGH BYTE (the screen address)
+		       Will together form the
