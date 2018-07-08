@@ -1166,7 +1166,7 @@ Project / Task : "Screen Manipulation"
                        We are using "zero page addressing" see 5), All addresses from $0000 to $00FF
                        Why at a zero page?
 		       We are going to use indirect address, and that needs 2 bytes at a zero-page, see 10)
-   A 0346 LDA #$00  => Here comes byte number two
+   A 0346 LDA #$00  => Here comes byte number 2s value $00
    A 0348 STA $BB   => $BB ===> LOW  BYTE = $00
                        $BC ===> HIGH BYTE = $04
 		       Remember low byte first, stored in memory in C64
@@ -1175,9 +1175,18 @@ Project / Task : "Screen Manipulation"
 		       $BB = $00   (Byte 1) LOW  BYTE,               $00 => bin 0000 0000
 		       $BC = $0288 (Byte 2) HIGH BYTE, at $0288 is a $04 => bin 0000 0100
 		       RESULT $BB $BC
-		              00  04
-			      0400
-    A 034A LDX #$00 => 
-    A 034C LDY #$04 => 
+		              00   04
+			     $0400 => start of screen memory YEHAAA
+    A 034A LDX #$00 => X-reg will be our line counter. We start at line 0.
+    A 034C LDY #$04 => Y-reg point at the start of the line, we want to start at possition 5
+                       Why? Because there is a frame/padding around the prompt of the C64 of 4 positions!?
     A 034E LDA ($BB), Y => Indirect Indexed addressing
+                           Start at $BB   + Y
+			   Start at $0400 + 4
+			   Start at $0404
+    A 0350 CMP #$20 => We do not want to take action when character SPACE is found.
+                       CMP uses value in A-reg to compare with $20
+                       SPACE hex value $20 as a decimal its 32
+    A 0352 BEQ $0356 => If it is a SPACE skip next operation at address $0354
+    A 0354 EOR #$80  => 
                            
