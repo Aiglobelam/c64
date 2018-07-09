@@ -1139,9 +1139,9 @@ Instructions:
 	
 Project / Task : "Screen Manipulation"
 
-   A (0,0) => $0288 => $0400 start of screen mem
-   B (0,4) =>          $0404 offest by 4 (skip 4 first blocks, start at position 5)
-   
+   A (0,0)  => $0288 => $0400 start of screen mem
+   B (0,5)  =>          $0404 offest by 4 (skip 4 first blocks, start at position 5)
+   C (0,18) => End of first line
 POS 1 2 3 4 5 6 7 8 9 10              18
     A       B = = = = = = = = = = = = C
     0       |          10             |     20                  30                40 
@@ -1154,9 +1154,9 @@ POS 1 2 3 4 5 6 7 8 9 10              18
     . . .
 25 |0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|
 
-40 columns => 20 + 20 => HEX $14 + $14
-                      => HEX $1F(31) + $09
-		      => HEX $28
+40 screen columns => 20 + 20 => HEX $14 + $14
+                             => HEX $1F(31) + $09
+		             => HEX $28
 		      
    A 033C LDA #$28  => Load value decimal 40 into A-reg, representing 40 columns screen, "Line length"
    A 033E LDX $0288 => Screen mem c64 starts at what value exist at address $0288
@@ -1223,5 +1223,7 @@ POS 1 2 3 4 5 6 7 8 9 10              18
                         That is branch to the code that uses indirect addressing for reading the next screen pos into A-reg
 			So branch if we have read less than 14 screen positions and EOR their content.
 			Each line we have decided is 14 positions, now continue with NEXT LINE
+   A 035D CLC        => Clear any eventual stuff set in S-reg by our INY addition.
+   A 035E LDA $BB    => 
 			
 			
