@@ -1247,5 +1247,18 @@ POS 1 2 3 4 5 6 7 8 9 10              18
 			When we have read line 14 the next address will be read
    A 0370 RTS        => We are done return to invoker
    
+PRESS X to exit to Basic from the monitor   
    
-			
+So what does the program do? It goes throug 14 lines on the screen
+Each line has 40 chars/positions, in our program we affect position 5 to 18 that is 14 chars/positions.
+Each of those line positions we do a EOR "mask" $80 
+That does what? => Alter the background color...
+
+Run program in BASIC
+
+100 FOR J=1 TO 10  // Run our program 10 times
+110 SYS 828        // Invoke program that starts at address dec 828 hex $033C
+120 FOR K=1 TO 200 // Do a loop that does nothing 200 times to slow things down
+130 NEXT K,J       // Run our program one more time
+
+This will run our program sevral times and alter the background color on 14 lines that each are 14 chars.
