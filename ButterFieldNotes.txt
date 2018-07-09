@@ -1261,4 +1261,6 @@ Run program in BASIC
 120 FOR K=1 TO 200 // Do a loop that does nothing 200 times to slow things down
 130 NEXT K,J       // Run our program one more time
 
+Type "RUN" to start the program
+
 This will run our program sevral times and alter the background color on 14 lines that each are 14 chars.
