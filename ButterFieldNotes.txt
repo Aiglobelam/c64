@@ -1237,7 +1237,10 @@ POS 1 2 3 4 5 6 7 8 9 10              18
    A 0367 ADC #$00   => We do this addition because a Carry flag migh have been set in the addition on $BB
                         We want that Carry to be passed on to $BC if that was the case (if $BB became greater than $FF)
    A 0369 STA $BC    => Store back the possibly larger value into $BC again
+                        So here we have moved on to another place in screen memory of the C64...
    A 036B INX        => We had choosen X-reg to be our counter for how many lines we had read/altered
                         So lets increment X-reg to "next line" first time it will be set to $01 unt so weiter...
-   A 036c 
+   A 036C CPX #$0E   => hex $0E dec 14 bin 0000 1110
+                        Check to see hos X-reg is compared to 14 (14 lines)
+   A 036E BNE $034C  => If X-reg valu is
 			
