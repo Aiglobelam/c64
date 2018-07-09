@@ -1139,8 +1139,12 @@ Instructions:
 	
 Project / Task : "Screen Manipulation"
 
-   $0288
-   0                   10                  20                  30                40
+   A (0,0) => $0288 => $0400 start of screen mem
+   B (0,4) =>          $0404 offest by 4 (skip 4 first blocks, start at position 5)
+   
+POS 1 2 3 4 5 6 7 8 9 10              18
+    A       B = = = = = = = = = = = = C
+    0       |          10             |     20                  30                40 
    |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
 0  |0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|
    |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
@@ -1184,9 +1188,40 @@ Project / Task : "Screen Manipulation"
                            Start at $BB   + Y
 			   Start at $0400 + 4
 			   Start at $0404
+			   So A-reg will be filled whats at position $0404 in memory.
     A 0350 CMP #$20 => We do not want to take action when character SPACE is found.
+                       ASCII for SPACE is 32 which in hex is $20
                        CMP uses value in A-reg to compare with $20
-                       SPACE hex value $20 as a decimal its 32
     A 0352 BEQ $0356 => If it is a SPACE skip next operation at address $0354
-    A 0354 EOR #$80  => 
-                           
+    A 0354 EOR #$80  => Exclusive OR on A-reg with "mask" $80 bin 1000 0000 dec 128+0+0+0 + 0+0+0+0 = 128 
+                        - - - -
+                        | EOR | 1 => Flip bit, 0 => Keep Origin
+                        - - - -
+                        A-Reg	Mask	Mask Meaning	Result
+                        0	0	Keep origin	0
+                        1	0	Keep origin	1
+                        0	1	Flip Bit	1
+                        1	1	Flip Bit	0
+			
+			If A-reg is "A"/ASCII 65/hex $41 bin 0100 0001 dec 0+64+0+0 + 0+0+0+1 = 65
+			    $41 : 0100 0001 : dec  65
+                        EOR $80 : 1000 0000 : dec 128
+			- - - - - - - - - - - - - - - -
+			    $C1 : 1100 0001 : dec 193 = 128+64+1
+			    
+			We are "FLIPPING" the highest bit of the value of the screen.
+   A 0356 STA($BB), Y => Indirect Index addressing when storing A-reg value
+                         Store value $C1 (prev $41) at the same screen position $0404 that we previously read from.
+			 Now we have done our magic to one screen position, some more to go!!!
+   A 0358 INY        => Increment Y with 1 (if y was 4 y is now 5)
+   A 0359 CPY $#12   => Compare Y-reg with value #$12 bin 0001 0010 dec 16+2 = 18
+                        Y will be incremented from 4 to 18
+			Y=4   Y=5   Y=6   Y=7   Y=8   Y=9   Y=10  Y=11  Y=12  Y=13  Y=14  Y=15  Y=16  Y=17  Y=18
+			1     2     3     4     5     6     7     8     9     10    11    12    13    14    SKIP
+			$0404,$0405,$0406,$0407,$0408,$0409,$040A,$040B,$040C,$040D,$040E,$040F,$0410,$0411,$0412
+   A 035B BCC $034E  => BCC = less than => Y < 18 => Branch if Y is less than 18
+                        That is branch to the code that uses indirect addressing for reading the next screen pos into A-reg
+			So branch if we have read less than 14 screen positions and EOR their content.
+			Each line we have decided is 14 positions, now continue with NEXT LINE
+			
+			
