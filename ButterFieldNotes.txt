@@ -1,5 +1,51 @@
 My notes for Machine Language for the Commodore 64 and other Commodore computers by Jim Butterfield
 
+Commodore 64 Microprocessor: 6510
+
+650x - The Bus (Memory busses)
+
+Control bus: ... The address bus is accompanied by a few extra wires... control things as read/write/timing...
+Address bus: 16 bits $0000-$FFFF <=> 00000000 00000000 - 11111111 11111111 <=> 0 - 65536 "65536 different voltages"
+Data    bus:  8 bits   $00-$FF   <=>          00000000 -          11111111 <=> 0 -   256 "  256 different voltages"
+
+Microprocessor sends out a call to a memory chip at adddress $0400
+It sends out voltages on 16 physical wires, the "Address bus"
+All memory chips reads the address and knows if the call was made for it.
+The selected memory chip answers.
+Data is then sent to/from microprocessor and selected memory chip using the "Data bus"
+It can be of type read/write.
+
+Using the "Address bus" we can reach
+
+	RAM: Random Access Memory, here we store programs, read/write
+
+	ROM: Read Only Memory, read ONLY, fixed routines, fixed stuff
+
+	IA:  Interface Adaptor, "memory mapped devices" 
+             ex: IO, Timing devices, Interupt control systems, video controll, sound controll
+	     
+Address split in 2 parts "roughly"
+
+	* HIGH: Selects specific chip
+	* LOW: Selects particular memory from selected chip
+	
+Microprocessor Registers
+
+	PC:    Program Counter, 16 bit, where should next instruction come from?
+	A,X,Y: Hold data, 8 bits
+	SR:    Status Register, aka PSW Processor Status Word, contain results of actions of data handling
+	SP:    Stack Pointer, Keeps track of a temporary storage area
+	
+Instruction Execution
+
+	1 PC reads from address bus address $1234 (if PC currently was executing from that address...)
+	2 Processor increment PC by 1, $1235
+	3 Information comes in from $1234
+	4 That information will be taken as an "instruction"
+	5 Processor has the instruction, which tells it to do something, processor do action
+	6 repeat GOTO 1
+	
+
 MLM = Machine Language Monitor
 Supermon by Jim Butterfield => "MLM generator"
 Instructions:
