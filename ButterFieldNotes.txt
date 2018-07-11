@@ -1323,14 +1323,21 @@ BASIC
 	SOB: Start Of Basic => $0801
 	EOB: End Of Basic => Some where after SOB, denotedt by 3 ZERO bytes $00, $00, $00
 	     In my case in VICE, $0833, $0834, $0835
+	$00
+	$00
+	$00
+	
 	PROGRAM: A program you write will take memory in between SOB to EOB, for each line of code the distance grow
+	
 	SOV: Start Of Variables, Right after EOB, all your PROGRAM variables will take up memory here.
 	     7 Byes per variable
 	     $002D and $002E contains the address for where SOV starts... => $0836 in my current VICE setup
-	SAVE: Basic SAVE command (direct mode)
-	      Computer saves all memory from SOB => SOV, the whole program that is includding the 3 zeros.
-	LOAD: Basic LOAD command (direct mode)
-	      Loads program to mem between   SOB => SOV
+	
+	      SAVE: Basic SAVE command (direct mode)
+	            Computer saves all memory from SOB => SOV, the whole program that is includding the 3 zeros.
+	      LOAD: Basic LOAD command (direct mode)
+	            Loads PROGRAM to mem between   SOB => SOV
+		    
 	SOA: Start Of Arrays
 	     $002F and $0030 => $0844 in my setup using VICE
 	     Arrays created by DIM command or default...
@@ -1346,3 +1353,11 @@ BASIC
 	     One location beyond last available byte to BASIC, could be like $A000
 	     $0037 and $0038 => $9519 in my VICE setup, (close to A000...)
 	     
+Where to put Your ML program?
+
+ A) $033C-$03FB: Cassette Buffer / Datasette buffer (192 bytes).
+ B) Move TOM pointer closer to BOS/EOA, and use the freed memory.
+ C) Move SOV pointer closer to SOA, use mem between SOB and new SOV
+ 
+ OBS in B anc C, after moving pointers, return to basic and run CLR => variable pointers will "allign" with the moved ones.
+ 
