@@ -1336,4 +1336,12 @@ BASIC
 	     Arrays created by DIM command or default...
 	EOA: End Of Arrays
 	     $0031 and $0032 => $0844 in my setup using VICE
-	
+	FREE: Free mem...
+        BOS: Bottom Of Strings
+	     Last dynamic string that has been created
+	     $0033 and $0034 => $9519 in my setup using VICE
+	     If no BASIC strings, the address will be the same as for TOM
+        TOM: Top Of Memory
+	     One location beyond last available byte to BASIC, could be like $A000
+	     $0037 and $0038 => $9519 in my VICE setup, (close to A000...)
+	     
