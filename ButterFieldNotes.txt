@@ -1339,6 +1339,7 @@ BASIC
 	FREE: Free mem...
         BOS: Bottom Of Strings
 	     Last dynamic string that has been created
+	     Strings created takes up FREE mem, that is BOS grows TOWARDS EOA
 	     $0033 and $0034 => $9519 in my setup using VICE
 	     If no BASIC strings, the address will be the same as for TOM
         TOM: Top Of Memory
