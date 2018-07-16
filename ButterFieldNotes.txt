@@ -1355,9 +1355,22 @@ BASIC
 	     
 Where to put Your ML program?
 
- A) $033C-$03FB: Cassette Buffer / Datasette buffer (192 bytes).
- B) Move TOM pointer closer to BOS/EOA, and use the freed memory.
- C) Move SOV pointer closer to SOA, use mem between SOB and new SOV
- 
- OBS in B anc C, after moving pointers, return to basic and run CLR => variable pointers will "allign" with the moved ones.
+   A) $033C-$03FB: Cassette Buffer / Datasette buffer (192 bytes).
+   B) Move TOM pointer closer to BOS/EOA, and use the freed memory.
+   C) Move SOV pointer closer to SOA, use mem between SOB and new SOV
+      OBS in B anc C, after moving pointers, return to basic and run CLR
+      CLR => variable pointers will "allign" with the moved ones.
+   D) 4K of RAM at $C000 to $CFFF, 49152 to 53247. Popular place may br used by other programs.
+   E) REMOVE BASIC
+      $0801 to $CFFF
+      2049 to 53247 => 51198
+      51198 / 1024 = 50K of free RAM
+      Free ram by typing => POKE 1,54 AKA (LDA #$36, STA $01) => $36 = 54 dec
+      Restore            => POKE 1,55 AKA (LDA #$37, STA $01) => $37 = 55 dec
+   F) Not so popular methond in Commodore machines
+      F1) Move SOB ($0801) to new address
+      F2) Store a 0 in the position before SOB, (before the new SOB address that is)
+      F3) Type the BASIC command "NEW" to allign pointers... whatever that mean!?
+    
+SOV
  
