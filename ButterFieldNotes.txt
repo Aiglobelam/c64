@@ -1,5 +1,23 @@
 My notes for Machine Language for the Commodore 64 and other Commodore computers by Jim Butterfield
 
+Q: How much mem does the C64 have?
+A: 64K
+Q: What?
+A: 64 KB or KBytes OR (K)ilo (B)ytes
+Q: What is a byte?
+A: 8 bits
+Q: So 1 kilobyte is 1000 times 8 bits 8000 bits?
+A: Nah... in this case.... its around that... and it is with capital K and B, KB not kb
+   1024 bytes is 1KB, binary you see, 2^10 = 2*2*2*2*2 * 2*2*2*2*2 = 1024 bits
+   1KB * 64 = 1024 bytes * 64 = 65536 bytes
+   65536 * 8 = 524288 bits
+Q: The address bus in C64 it is 16 bits... what does that mean?
+A: 16 bits can be represented by HEX values $0000-$FFFF
+   In this case that is a total  0 - 65536 addresses.
+   At each of these 65536 addressess there can be 8 bits, that is 1 byte stored
+   1 Byte aka 8 bits in HEX $00-$FF
+Q: A I see so the 64 in this case comes from 65536 / 1024 = 64 => Commodore 64 => C64
+
 Commodore 64 Microprocessor: 6510
 
 650x - The Bus (Memory busses)
