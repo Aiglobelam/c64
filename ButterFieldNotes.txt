@@ -1317,10 +1317,13 @@ This will run our program sevral times and alter the background color on 14 line
 
 Linking BASIC and Machine Language
 
-BASIC
 
+
+STUFF
 	C64: $002B and $002C zero pages: $2B and $2C contains the addres for where BASIC is stored in memory => SOB
-	SOB: Start Of Basic => $0801
+	CASSETTE BUFFER: $033C-$03FB
+BASIC	
+	SOB: $0801 Start Of Basic
 	EOB: End Of Basic => Some where after SOB, denotedt by 3 ZERO bytes $00, $00, $00
 	     In my case in VICE, $0833, $0834, $0835
 	$00
@@ -1372,5 +1375,20 @@ Where to put Your ML program?
       F2) Store a 0 in the position before SOB, (before the new SOB address that is)
       F3) Type the BASIC command "NEW" to allign pointers... whatever that mean!?
     
-SOV
+SOV - (S)tart (O)f (V)ariables
+
+   - Basic variables values are written here
+   - Basic command "SAVE" saves from SOB till SOV
+   - Basic command "LOAD" ... load prg into mem, set SOV to after end of prg !!!
+   - SOV is moved when more mem is required by BASIC
+   
+   Question: What happens if program is stored in Cassette Buffer???
+   Answer: SOV will be set to be before BASIC starts...
+   
+   BASIC LOAD => Oh no! using program, vars will be written in SOV, sooner or later write over BASIC it self.
+   BASIC SAVE => Oh no! SAVE start at SOB till SOV
+                 Basic will save program from $0801 -> $FFFF -> $0000 -> Cassette buffer $033C-$03FB
+   BASIC "Edit code" => Oh no! Basic moves mem starting at change point, until it reaches SOV, all mem is disaster.
+   
+   
  
