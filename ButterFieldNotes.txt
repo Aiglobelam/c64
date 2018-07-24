@@ -1409,4 +1409,58 @@ SOV - (S)tart (O)f (V)ariables
    BASIC "Edit code" => Oh no! Basic moves mem starting at change point, until it reaches SOV, all mem is disaster.
    
    
+MLM = Machine Language Monitor
+Supermon by Jim Butterfield => "MLM generator"
+Instructions:
+
+	R => Display / Change registers
+	M => Display / Change memory
+	S => Save memory to disk or tape
+	L => Load from disk or tape
+	G => Go to an machine language program
+	X => Exit to basic
+	A => Assemble
+	D => Disassemble
+	F => Fill memory with fixed contents
+	H => Hunts for a memory pattern
+	T => Transfers a block of memory to a new location
+	
+MLM - SAVE
  
+    S "NaMeOfPrOgRaM",format,memStart,memEnd
+    
+    EX) Save to tape
+        S "MyBestestPrgr",01,033C,0361
+	Save program with name "MyBestestPrgr" using TAPE format (01), save data from $033C to $0361
+ 
+    EX) Save to disk
+        S "0:MyBestestPrgr",08,033C,0361
+	hmmm??? 08 is format but what is the 0: in the program name?
+	
+MLM - LOAD
+    
+    - Load program without change the BASIC - SOV
+    - L "NaMeOfPrOgRaM",01
+	
+BASIC - LOAD
+ 
+    The Basic LOAD command changes the SOV when it is given as a DIRECT command in BASIC prompt.
+    When LOAD command is used from within a BASIC program SOV is not changed!!!
+    
+    - DIRECT command: LOAD "NaMeOfPrOgRaM",8,1
+    - PROGRAMMED command:  (for loading a machine language program, not another BASIC program)
+    	* Chaining => 
+    		A) No pointers affected, no vars will be lost
+		B) When a BASIC program executes its lines of code, it then when it sees a LOAD it executes it...
+		   And then one think that it would go to the line of code after LOAD, but NAH...
+		   After LOAD is executed it returns to the first line of code in the BASIC progam...
+		   A for ever loop is created...
+		   
+		   EX solution
+		   100 IF A=! GOTO 130
+		   110 A=!
+		   120 LOAD"NaMeOfPrOgRaM",8,1 (this will cause a jump to line 100)
+		   130 the rest of the code
+       
+       
+
