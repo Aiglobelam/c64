@@ -1414,24 +1414,55 @@ Where to put Your ML program?
    F) Not so popular methond in Commodore machines
       F1) Move SOB ($0801) to new address
       F2) Store a 0 in the position before SOB, (before the new SOB address that is)
-      F3) Type the BASIC command "NEW" to allign pointers... whatever that mean!?
+      F3) Type the BASIC command "NEW" to allign pointers... 
+          => Pointers like SOB SOV EOA TOM will be re calculated.
     
 SOV - (S)tart (O)f (V)ariables
 
    - Basic variables values are written here
    - Basic command "SAVE" saves from SOB till SOV
-   - Basic command "LOAD" ... load prg into mem, set SOV to after end of prg !!!
+   - Basic command "LOAD" ... load prg into mem, set SOV to after end of the loaded prg !!!
    - SOV is moved when more mem is required by BASIC
    
-   Question: What happens if program is stored in Cassette Buffer???
-   Answer: SOV will be set to be before BASIC starts...
+***Question: What happens if program is stored in Cassette Buffer??? $033C-$03FB
+   Answer: SOV will be set to be before BASIC starts when a "DIRECT" (see later...) BASIC LOAD is done...
    
    BASIC LOAD => Oh no! using program, vars will be written in SOV, sooner or later write over BASIC it self.
    BASIC SAVE => Oh no! SAVE start at SOB till SOV
                  Basic will save program from $0801 -> $FFFF -> $0000 -> Cassette buffer $033C-$03FB
    BASIC "Edit code" => Oh no! Basic moves mem starting at change point, until it reaches SOV, all mem is disaster.
    
+***Question: What happens if program is stored in high memory? 
+             B) Moving TOM closer to  BOS/EOA, and use the freed memory.
+	     D) Using mem at 4K of RAM at $C000 to $CFFF
+	     
+   Answer B) "Direct" BASIC LOAD, SOV affected! SOV will be positiond directly after loaded program.
+             No room for variables, we will almost directly get OUT OF MEMORY
+	     
+   Answer D) "Direct" BASIC LOAD, SOV affected! SOV will be positiond directly after loaded program.
+             No room for variables, we will almost directly get OUT OF MEMORY
+	     
+   In both B & D the SOV pointer will be a very high mem address...
    
+   	Solution: 
+		
+		1) FIRST:  BASIC LOAD, machine language program into "High mem" (B/D) => Bad placed SOV pointer
+		2) SECOND: BASIC LOAD, basic program, this second BASIC LOAD          => Will fix SOV pointer
+		3) THIRD:  ???? FIX TOM pointer and command NEW between the two loads.... 
+		   quote book: "you can not even give the next LOAD command if you are totally out of mem"
+		   One can fix pointer by using the MLM...
+		   M 002B 003A => list all BASIC pointers....
+		   
+***Question: Load ml program after EOB the three 0 0 0?
+             Then move the SOV to a higher memory address?
+   Answer: Will work IF
+           1) BASIC LOAD the Basic program first => SOV at correct place
+	   2) BASIC LOAD the mlm program into after EOB => SOV will move and be placed after that mlm program
+	      which is ok. We can now BASIC SAVE will work it will save borh programs...
+	      OBS one slight problem, we cannot change the BASIC program in 1)...
+	      Because if we do that the mlm program will be moved in memory, and our SYS command for loading
+	      the mlm program will point to the wrong address =)
+	   
 MLM = Machine Language Monitor
 Supermon by Jim Butterfield => "MLM generator"
 Instructions:
