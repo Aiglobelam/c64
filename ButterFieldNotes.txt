@@ -1516,5 +1516,38 @@ BASIC - LOAD
 		   120 LOAD"NaMeOfPrOgRaM",8,1 (this will cause a jump to line 100)
 		   130 the rest of the code
        
-       
+BASIC Variables
 
+   Names of vars can be include the chars A-Z and the numbers 0-9
+   First char of a variable name must be a letter.
+
+   - 7 bytes
+   - BYTE 1,2 the variable name => variable names can only consist of 2 chars!?
+   - BYTE 3,4,5,6,7 value or definition
+   - Type is a part of the name
+   
+   Ex a) Float : variable name "AB"  (Ascii code $41, $42) 0100 0001, 0100 0010
+   Ex b) Integr: variable name "AB%" (Ascii code $C1, $C2) 1100 0001, 1100 0010 (diff highest bit is set to 1 in both)
+   Ex c) String: variable name "AB$" (Ascii code $41, $C2) 0100 0001, 1100 0010 (diff highest bit is set to 1 in second)
+   Ex d) Function definition: variable name DEF FNA (...) TODO...
+   
+   Float: 
+	BYTE 1: ...
+	BYTE 2: ...
+	BYTE 3: ...
+	BYTE 4: ...
+	BYTE 5: ...
+	
+   Integer:
+   	BYTE 1
+	BYTE 2
+	BYTE 3: N/A
+	BYTE 4: N/A
+	BYTE 5: N/A
+   
+   String:
+      	BYTE 1: Length of string
+	BYTE 2: Address
+	BYTE 3: Address
+	BYTE 4: N/A
+	BYTE 5: N/A
