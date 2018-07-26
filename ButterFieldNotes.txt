@@ -1341,38 +1341,61 @@ STUFF
 	C64: $002B and $002C zero pages: $2B and $2C contains the addres for where BASIC is stored in memory => SOB
 	CASSETTE BUFFER: $033C-$03FB
 BASIC	
-	SOB: $0801 Start Of Basic
-	EOB: End Of Basic => Some where after SOB, denotedt by 3 ZERO bytes $00, $00, $00
-	     In my case in VICE, $0833, $0834, $0835
-	$00
-	$00
-	$00
+	SOB: Start Of Basic
+$0801	     $0801
 	
-	PROGRAM: A program you write will take memory in between SOB to EOB, for each line of code the distance grow
+	PROGRAM: A program you write will take memory in between SOB to EOB
+		 for each line of code the distance grow between SOB and EOB
 	
-	SOV: Start Of Variables, Right after EOB, all your PROGRAM variables will take up memory here.
+	EOB: End Of Basic
+	     Some where after SOB, denotedt by 3 ZERO bytes $00, $00, $00
+	     In my case in VICE
+$0833	     $0833 $00
+$0834	     $0834 $00
+$0835	     $0835 $00
+	
+	SOV: Start Of Variables
+	     Right after EOB, all your PROGRAM variables will take up memory here.
 	     7 Byes per variable
-	     $002D and $002E contains the address for where SOV starts... => $0836 in my current VICE setup
+	     Pointer addresses $002D and $002E contains the address for where SOV starts.
+	     $002D: $36 (Low Byte First)
+	     $002E: $08
+$0836	     Result: $0836
 	
-	      SAVE: Basic SAVE command (direct mode)
-	            Computer saves all memory from SOB => SOV, the whole program that is includding the 3 zeros.
-	      LOAD: Basic LOAD command (direct mode)
-	            Loads PROGRAM to mem between   SOB => SOV
+	     SAVE: Basic SAVE command (direct mode)
+	           Computer saves all memory from SOB => SOV, the whole program that is includding the 3 zeros.
+	     LOAD: Basic LOAD command (direct mode)
+	           Loads PROGRAM to mem between SOB => SOV
 		    
 	SOA: Start Of Arrays
-	     $002F and $0030 => $0844 in my setup using VICE
-	     Arrays created by DIM command or default...
+	     Arrays created by BASIC DIM command or default...
+	     Pointer addresses $002F and $0030 
+	     $002F: $44 (Low Byte First)
+	     $0030: $08 
+$0844	     Result: $0844 in my setup using VICE
+	     
 	EOA: End Of Arrays
-	     $0031 and $0032 => $0844 in my setup using VICE
-	FREE: Free mem...
+	     Pointer addresses $0031 and $0032 
+	     $0031: $44 (Low Byte First)
+	     $0032: $08 
+$0844	     Result $0844 in my setup using VICE (cause currently no arrays exist, same values as SOA)
+	     
+	FREE: Free mem... "Above EOA" will be eaten by strings... do not put your ML program here.
+	
         BOS: Bottom Of Strings
 	     Last dynamic string that has been created
 	     Strings created takes up FREE mem, that is BOS grows TOWARDS EOA
-	     $0033 and $0034 => $9519 in my setup using VICE
-	     If no BASIC strings, the address will be the same as for TOM
-        TOM: Top Of Memory
+	     Pointer Addresses: $0033 and $0034
+	     $0033: $19 (Low Byte First)
+	     $0034: $95 
+$9519	     Result: $9519 in my setup using VICE (If no BASIC strings, the address will be the same as for TOM)
+	     
+        TOM: Top Of Memory (EOB End Of Basic area)
 	     One location beyond last available byte to BASIC, could be like $A000
-	     $0037 and $0038 => $9519 in my VICE setup, (close to A000...)
+$9519	     Pointer Addresses: $0037 and $0038
+             $0037: $19 (Low Byte First)
+	     $0038: $95 
+	     Result: $9519 in my VICE setup, (close to A000...)
 	     
 Where to put Your ML program?
 
@@ -1448,15 +1471,15 @@ BASIC - LOAD
     When LOAD command is used from within a BASIC program SOV is not changed!!!
     
     - DIRECT command: LOAD "NaMeOfPrOgRaM",8,1
-    - PROGRAMMED command:  (for loading a machine language program, not another BASIC program)
+    - PROGRAMMED command:  (for loading a machine language program, not loading another BASIC program)
     	* Chaining => 
     		A) No pointers affected, no vars will be lost
 		B) When a BASIC program executes its lines of code, it then when it sees a LOAD it executes it...
-		   And then one think that it would go to the line of code after LOAD, but NAH...
+		   Then one think that it would go to the line of code after LOAD, but NAH...
 		   After LOAD is executed it returns to the first line of code in the BASIC progam...
 		   A for ever loop is created...
 		   
-		   EX solution
+		   EX solution for this "bug" is
 		   100 IF A=! GOTO 130
 		   110 A=!
 		   120 LOAD"NaMeOfPrOgRaM",8,1 (this will cause a jump to line 100)
