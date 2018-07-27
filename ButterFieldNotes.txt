@@ -1335,11 +1335,16 @@ This will run our program sevral times and alter the background color on 14 line
 
 Linking BASIC and Machine Language
 
-
-
 STUFF
-	C64: $002B and $002C zero pages: $2B and $2C contains the addres for where BASIC is stored in memory => SOB
+	C64: Address pointers $002B and $002C 
+	     "zero pages": $2B and $2C 
+	     Contains the addres for where BASIC is stored in memory => SOB
+	     $002B: $01 (Low Byte First)
+	     $002C: $08
+	     Result: $0801
+	     
 	CASSETTE BUFFER: $033C-$03FB
+	
 BASIC	
 	SOB: Start Of Basic
 $0801	     $0801
@@ -1515,14 +1520,21 @@ BASIC - LOAD
 		   110 A=!
 		   120 LOAD"NaMeOfPrOgRaM",8,1 (this will cause a jump to line 100)
 		   130 the rest of the code
-       
+
+BASIC commands
+
+   NEW 
+      The BASIC command NEW releases the whole BASIC RAM and the stack of the C64.
+      This way, BASIC program that eventually was stored in the memory will be deleted.
+      
 BASIC Variables
 
    Names of vars can be include the chars A-Z and the numbers 0-9
    First char of a variable name must be a letter.
+   Variable names can only consist of 2 chars! hmmm is it true?
 
    - 7 bytes
-   - BYTE 1,2 the variable name => variable names can only consist of 2 chars!?
+   - BYTE 1,2 the variable name
    - BYTE 3,4,5,6,7 value or definition
    - Type is a part of the name
    
@@ -1531,21 +1543,73 @@ BASIC Variables
    Ex c) String: variable name "AB$" (Ascii code $41, $C2) 0100 0001, 1100 0010 (diff highest bit is set to 1 in second)
    Ex d) Function definition: variable name DEF FNA (...) TODO...
    
-   Float: 
-	BYTE 1: ...
-	BYTE 2: ...
+   Float: var name "AB"
+   
+	BYTE 1: Name byte 1
+	BYTE 2: Name byte 2
 	BYTE 3: ...
 	BYTE 4: ...
 	BYTE 5: ...
+	Locate SOV => Pointer addresses $002D and $002E => M 2D 2E => $03 $08 => SOV = $0803
+	EX 1) 
+	   Create a new BASIC variable
+	   NEW => restore pointers and so on...
+	   A=5
+	   Check mem where SOV starts => M 0803
+	   BYTE: 1  2  3  4  5  6  7
+	   0803: 41 00 83 20 00 00 00
+	   BYTE 1: Ascii Hex value for "A", 0100 0001, $41
+	   BYTE 2: Ascii Hex value for "NOTHING", 0000 0000, $00 (We only used one char as variable name this time)
+	EX 2) 
+	   NEW
+	   AB=5
+	   BYTE: 1  2  3  4  5  6  7
+	   0803: 41 42 83 20 00 00 00
+	   BYTE 1: Ascii Hex value for "A", 0100 0001, $41
+	   BYTE 2: Ascii Hex value for "B", 0100 0010, $42
+	   
+   Integer: var name "AB%"
+   	BYTE 1: Name byte 1
+	BYTE 2: Name byte 2
+	BYTE 3: Value 256 - 32767
+	BYTE 4: Value 0-256
+	BYTE 5: ...
 	
-   Integer:
-   	BYTE 1
-	BYTE 2
-	BYTE 3: N/A
-	BYTE 4: N/A
-	BYTE 5: N/A
-   
-   String:
+	EX 1)
+	   NEW
+           A%=5
+	   BYTE: 1  2  3  4  5  6  7
+	   0803: C1 80 00 05 00 00 00
+	   BYTE 1: Ascii Hex value for "A" with the HIGH BIT set to 1
+	   BYTE 2: Ascii Hex value for "NOTHING", 0, ZERO, 0000 0000, with HIGH BIT set to 1 => 1000 0000 => $80
+	   BYTE 3: value is smaler than 256 so nothing here
+	   BYTE 4: value is 5
+	   BYTE 5: ...
+	   
+	EX 2)
+	   NEW
+	   AB%=5
+	   BYTE: 1  2  3  4  5  6  7
+	   0803: C1 C2 00 05 00 00 00
+	   BYTE 1: Ascii Hex value for "A", 0100 0001, $41 with the HIGH BIT set to 1 = 1100 0001, $C1
+	   BYTE 2: Ascii Hex value for "B", 0100 0010, $42 with the HIGH BIT set to 1 = 1100 0010, $C2
+	   BYTE 3: value is smaler than 256 so nothing here
+	   BYTE 4: value is 5
+	   BYTE 5: ...
+
+	EX 3)
+	   NEW
+	   AB%=32767 (highest possible possitive number in BASIC)
+	   BYTE: 1  2  3  4  5  6  7
+	   0803: C1 C2 7F FF 00 00 00
+	   BYTE 1: Ascii Hex value for "A", 0100 0001, $41 with the HIGH BIT set to 1 = 1100 0001, $C1
+	   BYTE 2: Ascii Hex value for "B", 0100 0010, $42 with the HIGH BIT set to 1 = 1100 0010, $C2
+	   BYTE 3: value is larger than 255 => $7F = 0111 1111 (guess the highest bit is used for signed numbers in BASIC)
+	   BYTE 4: value is 255 => $FF
+	   BYTE 5: ...
+
+	   
+   String: var name "AB$"
       	BYTE 1: Length of string
 	BYTE 2: Address
 	BYTE 3: Address
