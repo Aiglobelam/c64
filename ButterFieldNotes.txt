@@ -1547,9 +1547,9 @@ BASIC Variables
    
 	BYTE 1: Name byte 1
 	BYTE 2: Name byte 2
-	BYTE 3: ...
-	BYTE 4: ...
-	BYTE 5: ...
+	BYTE 3: ... Value is hidden deep in these 3 bytes... hard to see with the bare eye
+	BYTE 4: ... Value is hidden deep in these 3 bytes...
+	BYTE 5: ... Value is hidden deep in these 3 bytes...
 	Locate SOV => Pointer addresses $002D and $002E => M 2D 2E => $03 $08 => SOV = $0803
 	EX 1) 
 	   Create a new BASIC variable
@@ -1568,7 +1568,8 @@ BASIC Variables
 	   BYTE 1: Ascii Hex value for "A", 0100 0001, $41
 	   BYTE 2: Ascii Hex value for "B", 0100 0010, $42
 	   
-   Integer: var name "AB%"
+   Integer: var name "AB%", Integers make use of "%" to denote that the var is an integer,
+            crux: And when using integers as vars, the "highbit" of the variable name bytes is set to 1.
    	BYTE 1: Name byte 1
 	BYTE 2: Name byte 2
 	BYTE 3: Value 256 - 32767
@@ -1604,9 +1605,25 @@ BASIC Variables
 	   0803: C1 C2 7F FF 00 00 00
 	   BYTE 1: Ascii Hex value for "A", 0100 0001, $41 with the HIGH BIT set to 1 = 1100 0001, $C1
 	   BYTE 2: Ascii Hex value for "B", 0100 0010, $42 with the HIGH BIT set to 1 = 1100 0010, $C2
-	   BYTE 3: value is larger than 255 => $7F = 0111 1111 (guess the highest bit is used for signed numbers in BASIC)
+	   BYTE 3: value is larger than 255 => $7F = 0111 1111 (the highest bit is used for signed numbers in BASIC)
 	   BYTE 4: value is 255 => $FF
 	   BYTE 5: ...
+	   
+	EX 4)
+	   NEW
+	   AB%=-32768 (lowest possible value)
+	   AB%=-32767 (lowest possible value + 1)
+	   BYTE: 1  2  3  4  5  6  7
+	   -32768 0803: C1 C2 80 00 00 00 00
+	   -32767 0803: C1 C2 80 01 00 00 00
+	       -2 0803: C1 C2 FF FE 00 00 00
+	       -1 0803: C1 C2 FF FF 00 00 00
+	        0 0803: C1 C2 00 00 00 00 00
+		1 0803: C1 C2 00 01 00 00 00
+	   So for -32768     
+	   BYTE 1: Ascii Hex value for "A", 0100 0001, $41 with the HIGH BIT set to 1 = 1100 0001, $C1
+	   BYTE 2: Ascii Hex value for "B", 0100 0010, $42 with the HIGH BIT set to 1 = 1100 0010, $C2
+	   BYTE 3: $80, 1000 0000,
 
 	   
    String: var name "AB$"
