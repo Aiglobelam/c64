@@ -1172,6 +1172,7 @@ Address mode => In which way does an instruction obtain information
        How to find zero-pages?
        Look for unused locations.
              - They are at $00FC to $00FF => C,D,E,F => 4 locations, that give us 2 indirect addresses in zero-page
+             - In a mem map I read it is actually $00FB - $00Fe
        Look in "memory maps" designed as
              - "Work areas"
 	     - "utility pointers"
@@ -1632,3 +1633,40 @@ BASIC Variables
 	BYTE 3: Address
 	BYTE 4: N/A
 	BYTE 5: N/A
+	
+Exchanging Data: Basic and Machine Language
+
+   - BASIC PEEK and POOK command
+   - BASIC variables are stored in specific memory location, a machine language program can read/write them.
+       
+       * Search for BASIC variable NAME Integer AB% / Float "AB" /  String "AB$"
+       
+       * First BASIC variable starts at SOV
+       
+            Pointer addresses $002D and $002E contains the address for where SOV starts.
+	    $002D: $36 (Low Byte First)
+	    $002E: $08
+	    Result: $0836 is the addres of SOV
+         
+       * Store SOV $002D and $002E ($0836) as an Indirect Address with Index.
+       
+         EX) LDY $#02     => Y-reg will contain the hex value $02 bin 0000 0010 dec 2
+	     LDA ($2D), Y => A-reg (Accumulator)  will be used with Indirect Indexed addressing
+	                     CRUX: In Indirect address mode, ZERO-PAGEs must be used!!!
+			           Fortunately SOV is stored in 2 zero page addresses following each other
+				   Also the LOW BYTE is stored first YES!!!
+	                           SOV Low Byte : $2D : $002D (at a ZERO page)
+			           SOV High Byte: $2E : $002E (at a ZERO page)
+			           => Leads to that it is ok to use SOV pointer in indrirect index mode
+			     
+			     Result: The resulting Address where the real data can be found
+			             => HIGH BYTE  - LOW BYTE
+				     => $2E        - $2D
+				     => $14        - $62
+				     => $1462 + Y-reg
+				     => $1462 + $#02
+				     => $1464
+       
+ 
+		   
+		   
