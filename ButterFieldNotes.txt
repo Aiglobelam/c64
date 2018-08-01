@@ -1646,11 +1646,14 @@ Exchanging Data: Basic and Machine Language
             Pointer addresses $002D and $002E contains the address for where SOV starts.
 	    $002D: $36 (Low Byte First)
 	    $002E: $08
-	    Result: $0836 is the addres of SOV
+	    Result: $0836 is the addres of SOV in this ex case.
          
-       * Store SOV $002D and $002E ($0836) as an Indirect Address with Index.
+       * Store SOV $002D and $002E as an Indirect Address with Index. (SOV may vary!!!)
        
-         EX) LDY $#02     => Y-reg will contain the hex value $02 bin 0000 0010 dec 2
+         NOTE !!!! This is not a functional code, it is just a "skeleton" of how one might do it...
+       
+         EX) LDY $#00     => Y-reg will contain the hex value $00 bin 0000 0000 dec 0
+             loop: How to label??? maybe learnt later on in book?
 	     LDA ($2D), Y => A-reg (Accumulator)  will be used with Indirect Indexed addressing
 	                     CRUX: In Indirect address mode, ZERO-PAGEs must be used!!!
 			           Fortunately SOV is stored in 2 zero page addresses following each other
@@ -1664,9 +1667,58 @@ Exchanging Data: Basic and Machine Language
 				     => $2E        - $2D
 				     => $14        - $62
 				     => $1462 + Y-reg
-				     => $1462 + $#02
-				     => $1464
-       
+				     => $1462 + $#00
+				     => $1462
+				     
+                             We search for a integer variable named "AB%"
+			     "AB%" (Ascii code $C1, $C2) 1100 0001, 1100 0010
+			     A BASIC variable is 7 bytes long.
+			     We want to find this:
+			     BYTE 1: Ascii Hex value for "A", 0100 0001, $41 with the HIGH BIT set to 1 = 1100 0001, $C1
+	                     BYTE 2: Ascii Hex value for "B", 0100 0010, $42 with the HIGH BIT set to 1 = 1100 0010, $C2
+			     
+			     At address $1462 the 1st of 7 bytes is located.
+		CMP $C1	     We want A-reg it to be $C1
+		INY          Prepare Y-reg to check for second char "B" in the variable name that is stored in BYTE 2
+		             Y-reg is incremented with 1
+		BNE nextVar  If NOT Equal => 
+		                    1) INY with 6 (next variable starts there) 
+				    2) restart loop
+	        nextVar: 
+		
+		<TODO>	     If     Equal => INY with 1 to get next variable name (if it consist of 2 chars...)
+		<TODO>	     CHECK to se that we have not reached SOA Start Of Arrays
+			     Because if so we did not find our variable.
+		CMP $C2      Compare if the second char "B" matches
+		<TODO>       If NOT Equal => INY with 7 (next variable starts there) restart loop 
+		<TODO>	     If     Equal => I we have a MATCH yehaaaaa
+		<TODO>	     CHECK to se that we have not reached SOA Start Of Arrays
+			     Because if so we did not find our variable.
+  
+#############
+##  Project #
+#############
+
+Basic program inoke MLP to multiply by 10
+
+Place MLP behind EOB, (E)nd (O)f (B)asic
+
+1 Guess SIZE of our BASIC program
+
+just typed it in, it worked...
+
+###########################
+## Questions and  Project #
+###########################
  
+* Write several BASIC programs that invokes MLPs
+* ..
+* ...
 		   
-		   
+#############
+# CHAPTER 7 #
+#############
+
+Stack, USR, Interrupt and Wedge
+
+
