@@ -1721,4 +1721,31 @@ just typed it in, it worked...
 
 Stack, USR, Interrupt and Wedge
 
+Temporary Storage: The Stack
 
+ * push to stack: PHA push A-reg value to stack
+ * pull from stack: PLA pull value from stack into A-reg
+ * LIFO
+ * SP Stack Pointer
+ * $01FF - $0100
+ * If SP is $F8 next item in stack will be put at $01F8
+ * Next time after we have pushed it will be $F7
+ * SP vale below $40 signals trouble  =>BASIC may signal "OUT OF MEMORY"
+ 
+ * PHP / PLP
+   Push SR flags to stack / Pull SR flags from stack and put them into SR
+   Push the SR flags to stack: Nice to do when we want to chech several comparisons later on
+ 
+ * JSR / RTS
+   JSR: Jump To Subroutine => puts return address onto stack.
+   RTS: Picks the return address from the stack
+   Quirk: JSR puts return address -1 as 2 Bytes onto the stack, HIGH BYTE firstly, then the LOW BYTE
+          Ex) $0352: JSR $033C
+	             Next instruction is the one following JSR, In this case $0355
+		     Quirk: $0355 - 1 = $0354
+		     a) PUSH $03 to stack
+		     b) PUSH $54 to stack
+		     Then the routine at $033C executes and reaches RTS
+		     Which pulls first $54 the LOW BYTE then $03 the HIGH BYTE
+		     Quirk: $0354 + 1 = $0355 => The return address to start execute at
+              $0355: The return address
