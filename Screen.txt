@@ -55,13 +55,44 @@
     1       5         10        15        20        25        30        35        40 
 
 -------------------------------------
-- Screen RAM $0400-$07F7  1024 - 2023
+- Screen RAM $0400-$07E7  1024 - 2023
 -------------------------------------
 The screen consits of 25 rows with 40 columns each => 1000 positions
 Each position can hold 1 Byte AKA 8 bits
 The screen consists of 1000 bytes, 1000*8 bits, 8000 bits
 
-OBS address 2024 to 2039 aka $07E8-07F7 is unused!!! That is 16 Bytes.
+---------------
+- Unused memory
+---------------
+2024-2039 aka $07E8-07F7 is unused!!! That is 16 Bytes.
+
+-----------------
+- Sprite pointers
+-----------------
+1 Sprite = 64 bytes = $40 = 0100 0000
+2040-2047 $07F8-$07FF that is 8 Bytes
+1) $07f8, 2) $07f9, 3) $07fa, 4) $07fb, 5) $07fc, 6) $07fd, 7) $07fe, 8) $07ff
+
+If 1) $07F8 = #$00 data for sprite will be at pos $0000 in mem
+If 1) $07F8 = #$01 data for sprite will be at pos $0040 in mem
+If 1) $07F8 = #$02 data for sprite will be at pos $0080 in mem
+If 1) $07F8 = #$03 data for sprite will be at pos $00C0 in mem
+. . .
+If 1) $07F8 = #$80 data for sprite will be at pos $2000 in mem
+
+Formula: "sprite size in bytes" * "number stored in pointer" = "location in mem where sprite is"
+Formula:         #$40           *              $80           = $2000 
+
+Enable sprites = $d015
+If $d015 is $00 no sprites enabled         0000 0000
+If $d015 is $01 sprite 1 is enabled        0000 0001
+If $d015 is $02 sprite 2 is enabled        0000 0010
+If $d015 is $03 sprite 1 and 2 are enabled 0000 0011
+If $d015 is $04 sprite 3 is enabled        0000 0100
+If $d015 is $05 sprite 1 and 3 are enabled 0000 0101
+If $d015 is $06 sprite 2 and 3 are enabled 0000 0110
+If $d015 is $07 sprite 1,2,3 are enabled   0000 0111
+
 
 --------------------------------------
 - Color  RAM $D800-$DBE7 55296 - 56295
