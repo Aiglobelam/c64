@@ -15,7 +15,7 @@ READY.
 ```
 Where is program?. Load and list contents of disk.
 ```
-LOAD "$",8
+LOAD"$",8
 
 SEARCHING FOR $
 LOADING
@@ -25,7 +25,7 @@ Issue list command
 ```
 LIST
 ```
-Now we can do `LOAD "TURBOASS V7.1",8,1"` OR `LOAD"*",8,1`
+Now we can do `LOAD"TURBOASS V7.1",8,1"` OR `LOAD"*",8,1`
 ```
 SEARCHIN FOR TURBOASS V7.1
 LOADING
