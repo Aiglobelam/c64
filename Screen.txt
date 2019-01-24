@@ -61,6 +61,19 @@ The screen consits of 25 rows with 40 columns each => 1000 positions
 Each position can hold 1 Byte AKA 8 bits
 The screen consists of 1000 bytes, 1000*8 bits, 8000 bits
 
+------------------------
+- RESOLUTION c64 320*200
+------------------------
+    * Each column is 8 bits wide 
+    * There is 40 columns
+    * There is 25 rows
+        Horizontal resolution
+            Each h-row is 8 * 40 bits wide
+            Each h-row is 320    bits wide
+        Vertical resolution:
+            Each v-row is 8 * 25 bits wide
+            Each v-row is 200    bits wide
+
 ---------------
 - Unused memory
 ---------------

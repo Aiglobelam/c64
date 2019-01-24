@@ -1204,12 +1204,15 @@ Instructions:
 	
 Project / Task : "Screen Manipulation"
 
-   A (0,0)  => $0288 => $0400 start of screen mem
-   B (0,5)  =>          $0404 offest by 4 (skip 4 first blocks, start at position 5)
+   $0288: High byte of pointer to screen memory for screen input/output
+          Default: $04, $0400, 1024
+	  
+   A (0,0)  => $0400 start of screen mem
+   B (0,5)  => $0404 offest by 4 (skip 4 first blocks, start at position 5)
    C (0,18) => End of first line
 POS 1 2 3 4 5 6 7 8 9 10              18
-    A       B = = = = = = = = = = = = C
-    0       |          10             |     20                  30                40 
+    A       B = = = = | = = = = = = = C   20                  30                  40
+    0       |         |               |   |                   |                   |
    |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
 0  |0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|0|1|2|3|4|5|6|7|8|9|
    |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
