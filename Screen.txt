@@ -141,9 +141,11 @@ If $d015 is $ff sprite 1,2,3,4,5,6,7,8 are enabled 1111 1111
 
 $d010 move across all screen?
 
+
 --------------------------------------
 - Color  RAM $D800-$DBE7 55296 - 56295
 --------------------------------------
+* OBS Color Ram/Mem is only used to colorize screen jn in character mode not in bitmap mode.
 Maps 1:1 with Screen RAM
 Decide color in each position
 A color RAM Byte "0000     0000" 
@@ -151,3 +153,19 @@ A color RAM Byte "0000     0000"
                  "HIGH      LOW"
 The lower NIBBLE is used to set the forground color.
 Only 16 colors available in C64, 16 colors can be can be described using only 4 bits
+
+----------------------
+- Color in Bitmap mode
+----------------------
+* Colors are taken from screen memory not color ram
+One position 8x8 64 bits
+  1 2 3 4 5 6 7 8
+1 u u u u . . . .
+2 . . . . . . . .
+3 . . . . . . . .
+4 . . . . . . . .
+5 . . . . . . . .
+6 . . . . . . . .
+7 . . . . . . . .
+* u = upper 4 bits, if a bit is 1 it will have this color
+* l = lower 4 bits, if a bit is 0 it will have this color
