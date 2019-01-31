@@ -58,8 +58,8 @@
 - Screen RAM $0400-$07E7  1024 - 2023
 -------------------------------------
 The screen consits of 25 rows with 40 columns each => 1000 positions
-Each position can hold 1 Byte AKA 8 bits
-The screen consists of 1000 bytes, 1000*8 bits, 8000 bits
+Each position can hold 8x8 bits = 64 bits = 8 Bytes
+The screen consists of 1000 positions, each 8x8 bits => 1000x8x8 bits, 64000 bits
 
 ------------------------
 - RESOLUTION c64 320*200
