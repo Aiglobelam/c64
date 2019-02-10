@@ -79,6 +79,31 @@ The screen consists of 1000 positions, each 8x8 bits => 1000x8x8 bits, 64000 bit
 - Unused memory
 ---------------
 16 position, 2024-2039 aka $07E8-07F7 is unused!!! That is 16 Bytes.
+Hmmm don't I mean 24 locations??? must look into this...
+01 - 07E8,
+02 - 07E9,
+03 - 07EA,
+04 - 07EB,
+05 - 07EC,
+06 - 07ED,
+07 - 07EE,
+08 - 07EF,
+09 - 07F0,
+10 - 07F1,
+11 - 07F2,
+12 - 07F3,
+13 - 07F4,
+14 - 07F5,
+15 - 07F6,
+16 - 07F7,
+17 - 07F8,
+18 - 07F9,
+19 - 07FA,
+20 - 07FB,
+21 - 07FC,
+22 - 07FD,
+23 - 07FE,
+24 - 07FF Then comes #0800
 
 -----------
 - Color RAM => character aka text mode
