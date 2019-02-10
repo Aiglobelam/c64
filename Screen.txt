@@ -78,7 +78,7 @@ The screen consists of 1000 positions, each 8x8 bits => 1000x8x8 bits, 64000 bit
 ---------------
 - Unused memory
 ---------------
-2024-2039 aka $07E8-07F7 is unused!!! That is 16 Bytes.
+16 position, 2024-2039 aka $07E8-07F7 is unused!!! That is 16 Bytes.
 
 -----------
 - Color RAM => character aka text mode
