@@ -1,4 +1,4 @@
-    DEFAULT Memory layout based on value in reg #D018 (53272) 1101 0000 0001 1000
+    DEFAULT Screen Memory layout based on value in reg #D018 (53272) 1101 0000 0001 1000
     DEFAULT Value @ that address is "0001 xxxx" which indicates that mem start at #0400
     1       5         10        15        20        25        30        35        40 
     |       |         |         |         |         |         |         |         |
@@ -55,12 +55,13 @@
     |       |         |         |         |         |         |         |         |
     1       5         10        15        20        25        30        35        40 
 
--------------------------------------
-- Screen RAM $0400-$07E7  1024 - 2023
--------------------------------------
+------------
+- Screen RAM 
+------------
+Default location: $0400-$07E7  1024 - 2023
 The screen consits of 25 rows with 40 columns each => 1000 positions
-Each position can hold 8x8 bits = 64 bits = 8 Bytes
-The screen consists of 1000 positions, each 8x8 bits => 1000x8x8 bits, 64000 bits
+Each position is 8 bits wide, value 0-255
+1000 postions * 8 bits = 8000 bits to fill screen
 
 ------------------------
 - RESOLUTION c64 320*200
@@ -75,39 +76,295 @@ The screen consists of 1000 positions, each 8x8 bits => 1000x8x8 bits, 64000 bit
             Each v-row is 8 * 25 bits wide
             Each v-row is 200    bits wide
 
----------------
-- Unused memory
----------------
-16 position, 2024-2039 aka $07E8-07F7 is unused!!! That is 16 Bytes.
-Hmmm don't I mean 24 locations??? must look into this...
-01 - 07E8,
-02 - 07E9,
-03 - 07EA,
-04 - 07EB,
-05 - 07EC,
-06 - 07ED,
-07 - 07EE,
-08 - 07EF,
-09 - 07F0,
-10 - 07F1,
-11 - 07F2,
-12 - 07F3,
-13 - 07F4,
-14 - 07F5,
-15 - 07F6,
-16 - 07F7,
-17 - 07F8,
-18 - 07F9,
-19 - 07FA,
-20 - 07FB,
-21 - 07FC,
-22 - 07FD,
-23 - 07FE,
-24 - 07FF Then comes #0800
+############################################
+# VIDEO BANK SELECTION #DD00               #
+# @ 6526 Complex Interface Adapter Chip #2 #
+# (CIA #2)                                 #
+############################################
 
------------
-- Color RAM => character aka text mode
------------
+64 K of mem in c64
+Vic can see 16K memory at a time
+64K/16K = 4 => 4 memory banks
+
+================================
+= SELECT mem BANK for vic to use
+================================
+
+#DD00: To address which memory bank to use, set only 2 lowest bits of #DD00
+
+- - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - -
+- - #DD00                 - -
+- - %1101 1101 0000 0000  - -
+- - 56576                 - -
+- - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - -
+
+    Obs line 1 is just to make sure that bits 0 and 1 of a specific register is set to 1 "outputs".
+    That somehow make line 2 work... But what I see it 56578 is default set to 0 and 1
+
+    LINE 1: POKE 56578, PEEK(56578) or 3 : REM Make sure bits 0 and 1 are set to outputs
+
+    This line is the actual formula choosing the memory bank to use
+    (A) is one of several values
+    252 => #FC => 1111 1100
+
+    LINE 2: POKE 56576,(PEEK(56576) AND 252 OR A)
+
+    IF DD00 is 1001 0111 => Two lowest bits are 11 => bank 0 is used
+               1001 0111
+           AND 1111 1100 (252)
+           - - - - - - - 
+               1001 0100 (last two bits are ZEROed out, others kept)
+
+           OR  0000 0011 (A = 3)
+           - - - - - - -
+               1001 0111 (we set the last 2 bits to what A was set to)
+
+    - - - - - - - - -
+    - Value @ #DD00 -
+    - - - - - - - - -
+    A == 3 => %xxxx xx11 => bank 0 => $0000-$3fff     0 - 16383 => DEFAULT
+    A == 2 => %xxxx xx10 => bank 1 => $4000-$7fff 16384 - 32767 (Char set not available at bank 1)
+    A == 1 => %xxxx xx01 => bank 2 => $8000-$bfff 32768 - 49151
+    A == 0 => %xxxx xx00 => bank 3 => $c000-$ffff 49152 - 65535 (Char set not available at bank 3)
+
+    Value @ DD00 => PRINT PEEK(56576)
+    Value @ DD00 => 151
+    Value @ DD00 => #97
+    Value @ DD00 => 9    7
+    Value @ DD00 => 1001 0111
+                 => Two lowest bits are 11
+                 => bank 0 is used
+                 => This is the DEFAULT bank 0 => $0000-$3fff => 0 - 16383
+
+###########################################
+# VIC CHIP - and its 47 Control registers #
+# @ #D000 -> #D02E                        #
+# @ 53248 -> 53294                        #
+# %1101 0000 0000 0000                    #
+# %1101 0000 0010 1110                    #
+###########################################
+
+#D018 Memory setup register. Memory Control Register. (Screen Memory, Char memory)
+
+- - - - - - - - - - - - - -
+- - - - - - - - - - - - - -
+- - #D018               - -
+- - 1101 0000 0001 1000 - -
+- - 53272               - -
+- - - - - - - - - - - - - -
+- - - - - - - - - - - - - -
+
+    Value @ D018 => xxxx xxxx (8 bits) 
+    Value @ D018 => 7654 3210 (8 bits) 
+
+    Bits 7654 => Video Matrix Base Address (inside VIC)
+              => That is the location of the screen memory
+
+    OBS yes bit 3 is used 2 times pending on mode...
+
+    Bits    3 => Bitmap-Mode: Select Base Address
+              => some how set Base memory address when in bit map mode I guess
+
+    Bits  321 => Character Dot-Data Base Address
+              => some how set Base memory address when in text mode I guess
+
+    Bits    0 => Unused
+
+    value @ D018 => PRINT PEEK(53272)
+    value @ D018 => 21
+    value @ D018 => #15
+    value @ D018 => 0001 0101
+                 => 7654 3210 => 4 upper bits 7654 Video Matrix Base Address (inside VIC)
+                 => 0001 xxxx => this 1 is worth (16) in decimal
+                 => 0001 xxxx => is the DEFAULT value in a C64 on startup
+
+===============================
+= Set location of SCREEN MEMORY
+===============================
+
+    * DEFAULT start at #0400
+
+    POKE 53272, (PEEK(53272) AND 15) OR A
+
+    * Manipulate 4 highest bits of #D018 (bit 7,6,5 and 4)
+    * DEFAULT Value @ #D018 on C64 startup => 21, #15, 0001 0101 => highest bits 0001
+
+    * AND 15 => 15, #0F, 0000 1111 => 0 out 4 highest bits, keep 4 lowest
+
+    * There are 4 banks of memory of each 16K of mem in the C64 (16 * 4 = 64K)
+    * The default bank  of memory => bank 0 
+      => addresses $0000-$3fff => 0-16383 => DEFAULT
+      => we can use 16384 addresses
+      => at each address we can store one byte, 8 bits
+
+    * The screen consists of 25 rows with 40 columns each => 1000 positions
+    * And in beach bank 0/1/2/3 of 16K memory we have place for 16 ranges of 1000 positions
+    * That is we can place the start of our screen memory at 16 starting positions
+    * Default stating position is bank 0 => $0000-$3fff => 0 - 16383
+
+    (1) #0000 - #03FF (1000 positions + 24)
+
+      IF position 0 starts at #0000 position 999 is at #03E7 then there comes 24 more positions!?
+      01-03E8, 02-03E9, 03-03EA, 04-03EB, 05-03EC, 06-03ED, 07-03EE, 08-03FF, 09-03F0, 10-03F1,
+      11-03F2, 12-03F3, 13-03F4, 14-03F5, 15-03F6, 16-03F7, 17-03F8, 18-03F9, 19-03FA, 20-03FB,
+      21-03FC, 22-03FD, 23-03FE, 24-03FF
+      Then comes #0400
+
+    (2) #0400 - #07FF (1000 positions DEFAULT location + 24)
+
+      IF position 0 starts at #0400 position 999 is at #07E7 then there comes 24 more positions!?
+      01-07E8, 02-07E9, 03-07EA, 04-07EB, 05-07EC, 06-07ED, 07-07EE, 08-07EF, 09-07F0, 10-07F1,
+      11-07F2, 12-07F3, 13-07F4, 14-07F5, 15-07F6, 16-07F7, 17-07F8, 18-07F9, 19-07FA, 20-07FB,
+      21-07FC, 22-07FD, 23-07FE, 24-07FF
+      Then comes #0800
+
+    (3) #0800 - #0BFF (1000 + 24 positions)
+    (4) #0C00 - #0FFF (1000 + 24 positions)
+    (5) #1000 - #13FF (1000 + 24 positions)
+    ... unt so weiter
+    (16) #3C00 - #3FFF (1000 + 24 positions)
+
+    * In our function below variable (A) can have 16 valid values
+    * Each of these 16 values/positions is a range of 1000 addresses
+    * That is 1/16 available address space of the current selected video bank for vic chip
+    * Valid values of A => 0,(16),32,48,64,80,96,112,128,144,160,176,192,208,224,240
+    * A=16 is the default value on C64v startup
+
+    POKE 53272, (PEEK(53272) AND 15) OR A
+
+           0001 0101 (Value @ #D018)
+       AND 0000 1111 (AND 15)
+       - - - - - - - - - - - -
+           0000 0101 (Zero out 4 high/upper bits, keep current values for lowest 4 bits)
+                     (Remember? It is only the 4 high bits that decide start of screen mem)
+
+    (1) #0000 - #03FF
+
+           0000 0101
+       OR  0000 0000 (A=0)
+       - - - - - - -
+           0000 0101
+           7654 xxxx RESULT means 4 high bits 0000 => SCREEN MEMORY @ #0000
+
+    (2) #0400 - #07FF
+
+           0000 0101
+       OR  0001 0000 (A=16) DEFAULT
+       - - - - - - -        
+           0001 0101
+           7654 xxxx RESULT means 4 high bits 0001 => SCREEN MEMORY @ #0400 DEFAULT location
+
+    (3) #0800 - #0BFF
+
+           0000 0101
+       OR  0010 0000 (A=32)
+       - - - - - - -        
+           0010 0101
+           7654 xxxx RESULT means 4 high bits 0010 => SCREEN MEMORY @ #0800
+
+    (16) #3C00 - #3FFF
+
+           0000 0101
+       OR  1111 0000 (A=240)
+       - - - - - - -        
+           1111 0101
+           7654 xxxx RESULT means 4 high bits 1111 => SCREEN MEMORY @ #3C00
+
+    So when we have set where screen memory should start, that position is the first position
+    Then there comes 999 more so we get 1000, and then there are those 24 extra positions...
+
+==================================
+= Set location of CHARACTER MEMORY
+==================================
+
+    * Manipulate bit 321 s of #D018
+    * Char set consists of 256 chars, each char is 8 bytes
+      1 2 3 4 5 6 7 8
+    1 . . . . . . . .
+    2. . . . . . . .
+    3 . . . . . . . .
+    4 . . . . . . . .
+    5 . . . . . . . .
+    6 . . . . . . . .
+    7 . . . . . . . .
+    8 . . . . . . . .
+    * 256 chars will take up 256x8 bytes = 2048 bytes of memory => 2 k
+    * We have 16 k available in each bank => 16k/2k => 8 locations for a complete char set
+
+    POKE 53272, (PEEK(53272) AND 240)     OR A
+
+    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #0000 - #07FF
+    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #0800 - #0FFF
+    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #1000 - #17FF (DEFAULT)
+    ...                                      6  => #1800 - #1FFF
+    ...                                      8  => #2000 - #27FF
+    ...                                      10 => #2800 - #2FFF
+    ...                                      12 => #3000 - #37FF
+    (8) POKE 53272, (PEEK(53272) AND 240) OR 14 => #3800 - #3FFF
+
+- - - - - - - - - - - - - -
+- - - - - - - - - - - - - -
+- - #D011               - -
+- - 1101 0000 0001 0001 - -
+- - 53265               - -
+- - - - - - - - - - - - - -
+- - - - - - - - - - - - - -
+
+    Screen control register
+    Defaults to value #1B aka %0001 1011 aka 27 
+
+    Bit #0-#2: Vertical raster scroll.
+    Bit #3: Screen height; 
+            0 = 24 rows; 
+    	1 = 25 rows.
+    Bit #4: 0 = Screen off, complete screen is covered by border; 
+            1 = Screen on, normal screen contents are visible.
+===> Bit #5: 0 = Text mode;
+===>         1 = Bitmap mode.
+    Bit #6: 1 = Extended background mode on.
+    Bit #7: Read: Current raster line (bit #8).
+            Write: Raster line to generate interrupt at (bit #8).
+
+    value @ D011 => print peek(53265)
+    value @ D011 => 27
+    value @ D011 => #1B
+    Value @ D011 => 0001 1011
+                 => 76x4 3210
+                 => x = Bit 5 
+                 => x = 0
+                 => Text mode is activated
+
+=====================
+= Turn on BITMAP MODE
+=====================
+
+    poke 53265, peek(53265) or 32
+    poke 53265, 0001 1011   or 32 (bit 5 is 0)
+
+            0001 1011
+         OR 0010 0000 (32)
+         - - - - - - -
+	    0011 1011
+            76x4 3210 => Bit 5(x) is now 1 => Bit map mode is on
+
+=====================
+= Turn on TEXT   MODE
+=====================
+
+    poke 53265, peek(53265) and 223
+    poke 53265, 0011 1011   and 223 (bit 5 is 1 if bit map mode is on)
+            
+            0011 1011
+        AND 1101 1111 (zero out high 8 bits, keep low 8 except bit 5)
+        - - - - - - -
+            0001 0001
+              54 3210 => Bit 5 is 0 => Bit map off => text mode on
+
+--------------------
+- Color Memory / RAM => character aka text mode
+--------------------
 OBS Color Ram/Mem is only used to colorize screen jn in character mode (not in bitmap mode).
 1000 Memory positions: $D800-$DBE7 55296 - 56295
 Maps 1:1 with Screen RAM
