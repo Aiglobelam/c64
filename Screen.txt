@@ -281,28 +281,41 @@ Vic can see 16K memory at a time
 
     * Manipulate bit 321 s of #D018
     * Char set consists of 256 chars, each char is 8 bytes
-      1 2 3 4 5 6 7 8
+      7 6 5 4 3 2 1 0
+    0 . . . . . . . . (8 bits = 1 byte)
     1 . . . . . . . .
-    2. . . . . . . .
+    2 . . . . . . . .
     3 . . . . . . . .
     4 . . . . . . . .
     5 . . . . . . . .
     6 . . . . . . . .
     7 . . . . . . . .
-    8 . . . . . . . .
     * 256 chars will take up 256x8 bytes = 2048 bytes of memory => 2 k
     * We have 16 k available in each bank => 16k/2k => 8 locations for a complete char set
 
     POKE 53272, (PEEK(53272) AND 240)     OR A
 
-    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #0000 - #07FF
-    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #0800 - #0FFF
-    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #1000 - #17FF (DEFAULT)
-    ...                                      6  => #1800 - #1FFF
-    ...                                      8  => #2000 - #27FF
-    ...                                      10 => #2800 - #2FFF
-    ...                                      12 => #3000 - #37FF
-    (8) POKE 53272, (PEEK(53272) AND 240) OR 14 => #3800 - #3FFF
+    OBS Character Generator Rom only available in VIC bank 0 and 2
+
+VIC Video BANK 0 => pos (3) and (4)
+
+    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #0000 - #07FF [2k] (   0 - 2047 = 2048 locations)
+    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #0800 - #0FFF [2k] (2048 - 4095 = 2048 locations)
+    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #1000 - #17FF [2k] (4096 - 6143 = 2048 locations) DEFAULT
+    (4) ...                                  6  => #1800 - #1FFF [2k] (6144 - 8191 = 2048 locations) DEFAULT also...?
+    (5) ...                                  8  => #2000 - #27FF [2k] 
+    (6) ...                                  10 => #2800 - #2FFF [2k] 
+    (7) ...                                  12 => #3000 - #37FF [2k] 
+    (8) POKE 53272, (PEEK(53272) AND 240) OR 14 => #3800 - #3FFF [2k]
+                                                                [16k]
+VIC Video BANK 2 => pos (x) and (y)
+
+    (x)                                            #9000 - #97FF [2k] 
+    (y)                                            #9800 - #9FFF [2k]
+    
+BUT !!!!!
+
+    Character ROM is realy @ #D000-#DFFF
 
 - - - - - - - - - - - - - -
 - - - - - - - - - - - - - -
