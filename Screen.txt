@@ -101,9 +101,11 @@ Vic can see 16K memory at a time
 - - - - - - - - - - - - - - -
 
     Obs line 1 is just to make sure that bits 0 and 1 of a specific register is set to 1 "outputs".
-    That somehow make line 2 work... But what I see it 56578 is default set to 0 and 1
+    That somehow make line 2 work... 
+    But what I see the default on start up value at memory address 56578 #DD02 is 63 / #3F / 0011 1111
+    That is those last two bits are already set to "1"
 
-    LINE 1: POKE 56578, PEEK(56578) or 3 : REM Make sure bits 0 and 1 are set to outputs
+    LINE 1: POKE 56578, PEEK(56578) or 3 : REM Make sure bits 0 and 1 are set to 1 "aka" outputs
 
     This line is the actual formula choosing the memory bank to use
     (A) is one of several values
