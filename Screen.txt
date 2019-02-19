@@ -299,25 +299,58 @@ Vic can see 16K memory at a time
 
     OBS Character Generator Rom only available in VIC bank 0 and 2
 
-VIC Video BANK 0 => pos (3) and (4)
+    VIC Video BANK 0 => $0000-$3fff     0 - 16383 [16k] => DEFAULT
+    VIC Video BANK 1 => $4000-$7fff 16384 - 32767 [16k] => (Char set NOT available at bank 1)
+    VIC Video BANK 2 => $8000-$bfff 32768 - 49151 [16k] => 
+    VIC Video BANK 3 => $c000-$ffff 49152 - 65535 [16k] => (Char set NOT available at bank 3)
 
-    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #0000 - #07FF [2k] (   0 - 2047 = 2048 locations)
-    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #0800 - #0FFF [2k] (2048 - 4095 = 2048 locations)
-    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #1000 - #17FF [2k] (4096 - 6143 = 2048 locations) DEFAULT
-    (4) ...                                  6  => #1800 - #1FFF [2k] (6144 - 8191 = 2048 locations) DEFAULT also...?
-    (5) ...                                  8  => #2000 - #27FF [2k] 
-    (6) ...                                  10 => #2800 - #2FFF [2k] 
-    (7) ...                                  12 => #3000 - #37FF [2k] 
-    (8) POKE 53272, (PEEK(53272) AND 240) OR 14 => #3800 - #3FFF [2k]
-                                                                [16k]
-VIC Video BANK 2 => pos (x) and (y)
+If Selected VIC Video BANK 0 => $0000-$3fff (0 - 16383)         [16k] => DEFAULT 
 
-    (x)                                            #9000 - #97FF [2k] 
-    (y)                                            #9800 - #9FFF [2k]
+    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #0000 - #07FF [2k] (    0 -  2047 = 2048 locations)
+    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #0800 - #0FFF [2k] ( 2048 -  4095)
+    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #1000 - #17FF [2k] ( 4096 -  6143) DEFAULT Char Generator Rom
+    (4) ...                                  6  => #1800 - #1FFF [2k] ( 6144 -  8191) DEFAULT Char Generator Rom
+    (5) ...                                  8  => #2000 - #27FF [2k] ( 8192 - 10239
+    (6) ...                                  10 => #2800 - #2FFF [2k] (10240 - 12287
+    (7) ...                                  12 => #3000 - #37FF [2k] (12288 - 14335
+    (8) POKE 53272, (PEEK(53272) AND 240) OR 14 => #3800 - #3FFF [2k] (14336 - 16383
+                                                                							
+If selected VIC Video BANK = 1 => start @ $4000 (16384)          [16k]
+
+    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #4000 - #47FF [2k] (16384 - 18431
+    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #4800 - #4FFF [2k] (18432 - 20479
+    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #5000 - #57FF [2k] (20480 - 22527 No char gen rom 
+    (4) ...                                  6  => #5800 - #5FFF [2k] (22528 - 24575 No char gen rom
+    (5) ...                                  8  => #6000 - #67FF [2k] (24576 - 26623
+    (6) ...                                  10 => #6800 - #6FFF [2k] (26624 - 28671
+    (7) ...                                  12 => #7000 - #77FF [2k] (28672 - 30719
+    (8) POKE 53272, (PEEK(53272) AND 240) OR 14 => #7800 - #7FFF [2k] (30720 - 32767
+                                                                    
+If selected VIC Video BANK = 2 => start $8000 (32768)            [16k]
+
+    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #8000 - #87FF [2k] (32768 - 34815
+    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #8800 - #8FFF [2k] (34816 - 36863
+    (3) ...                                  4  => #9000 - #97FF [2k] (36864 - 38911) Char Generator Rom
+    (4) ...                                  6  => #9800 - #9FFF [2k] (38912 - 40959) Char Generator Rom
+    (5) ...                                  8  => #A000 - #A7FF [2k] (40960 - 43007
+    (6) ...                                  10 => #A800 - #AFFF [2k] (43800 - 45055
+    (7) ...                                  12 => #B000 - #B7FF [2k] (45056 - 47103
+    (8) POKE 53272, (PEEK(53272) AND 240) OR 14 => #B800 - #BFFF [2k] (47104 - 49151
+                                                                        
+If selected VIC Video BANK = 3 => Start $C000 (49152)            [16k]
+
+    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #C000 - #C7FF [2k] (49152 - 51199
+    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #C800 - #CFFF [2k] (51200 - 53247
+    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #D000 - #D7FF [2k] (53248 - 55295) No char gen rom 
+    (4) ...                                  6  => #D800 - #DFFF [2k] (55296 - 57343) No char gen rom
+    (5) ...                                  8  => #E000 - #E7FF [2k] (57344 - 59391)
+    (6) ...                                  10 => #E800 - #EFFF [2k] (59392 - 61439)
+    (7) ...                                  12 => #F000 - #F7FF [2k] (61440 - 63487)
+    (8) POKE 53272, (PEEK(53272) AND 240) OR 14 => #F800 - #FFFF [2k] (63488 - 65535)
     
-BUT !!!!!
+BUT !!!!! hmmm don't understand this yet...
 
-    Character ROM is realy @ #D000-#DFFF
+    Character ROM is actually @ #D000-#DFFF, VIC BANK 3 pos 3,4
 
 - - - - - - - - - - - - - -
 - - - - - - - - - - - - - -
