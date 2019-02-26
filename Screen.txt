@@ -376,21 +376,78 @@ OBS   So either I/O (+ more) or Char ROM is at these locations
         [512] => #DC00 - #DDFF / #1C00 - #1DFF Lower case reversed chars
         [512] => #DE00 - #DFFF / #1E00 - #1FFF Upper case reversed & graph?
 
-OBS   When Char ROM is switched in NO INTERUPTS ARE ALLOWED
+OBS   When Char ROM is switched in instead of I/O, NO INTERUPTS ARE ALLOWED.
+      Beacuse I/O is needed to take care of interupts when they happen.
 
-==========================
-= TURN OFF INTERRUPTS
-==========================
+     - - - - - - - - - - - - - -
+     - - - - - - - - - - - - - -
+     - - #DC0E (not vic reg) - -
+     - - 1101 1100 0000 1110 - -
+     - - 56334               - -
+     - - - - - - - - - - - - - -
+     - - - - - - - - - - - - - -
 
-
-todo...
-
-==========================
-= TURN ON INTERRUPTS
-==========================
-
-todo...
-
+     ==========================
+     = TURN OFF INTERRUPTS
+     ==========================
+     POKE 56334, PEEK(56334) AND 254
+     
+     Start value @ 56334 => 1 = 0000 0001 => #01
+     
+         0000 0001
+     AND 1111 1110 Keep all bits but the lsb
+     - - - - - - - 
+         0000 0000
+	 
+     ==========================
+     = TURN ON INTERRUPTS
+     ==========================
+     POKE 56334, PEEK(56334) OR 1
+     
+        abcd efg0
+     OR 0000 0001 Keep all bits and switch lsb no matter what value before
+     - - - - - - -
+        abcd efg1
+	
+     ==========================
+     = SWITCH CHAR ROM IN
+     ==========================
+     Default Start value @ 1 => 55 = 0011 0111 => #37
+     processor "bits" @ 1
+     First 3 bits => config mem areas #A000 - #BFFF, #D000 - #DFFF, #E000 - #EFFF 
+     7654 3210
+     (1)   .... .x00 => RAM vissible @ #A000 - #BFFF, #D000 - #DFFF, #E000 - #EFFF 
+     (2)   .... .x01 => RAM vissible @ #A000 - #BFFF,                #E000 - #EFFF 
+     (3)   .... .x10 => RAM vissible @ #A000 - #BFFF,   kernal rom @ #E000 - #EFFF
+     (4)   .... .x11 => BASIC ROM    @ #A000 - #BFFF,   kernal rom @ #E000 - #EFFF
+     (5)   .... .0xx => CHAR ROM                    @ #D000 - #DFFF
+     (5.1) .... .011 => CHAR ROM                    @ #D000 - #DFFF
+     (5.2) .... .010 => CHAR ROM                    @ #D000 - #DFFF
+     (5.3) .... .001 => CHAR ROM                    @ #D000 - #DFFF
+     (5.4) .... .000 => NOPE see (1)
+     (6)   .... .1xx => I/O vissible                @ #D000 - #DFFF
+     
+     POKE 1, PEEK(1) AND 251
+     
+         7654 3210
+         0011 0111 (value @ 1)
+     AND 1111 1011 (251)
+     - - - - - - -
+         0011 0011 Keep topmost 5 bits 7654 3, keep 2 lsb bits 10, and set bit 3 to ZERO
+         .... .011 => (4)   .... .x11 => BASIC ROM  @ #A000 - #BFFF,      kernal rom @ #E000 - #EFFF
+	           => (5.1) .... .011 => CHAR ROM                   @ #D000 - #DFFF
+		   
+     ==========================
+     = SWITCH I/O IN AGAIN
+     ==========================
+     POKE 1, PEEK(1) OR 4 
+        0011 0011
+     OR 0000 0100
+     - - - - - - -
+        0011 0111 (back to default value @ 1)
+	.... .111 => (4)   .... .x11 => BASIC ROM  @ #A000 - #BFFF,      kernal rom @ #E000 - #EFFF
+	          => (6)   .... .1xx => I/O vissible                @ #D000 - #DFFF
+		  
 - - - - - - - - - - - - - -
 - - - - - - - - - - - - - -
 - - #D011               - -
