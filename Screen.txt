@@ -350,7 +350,46 @@ If selected VIC Video BANK = 3 => Start $C000 (49152)            [16k]
     
 BUT !!!!! hmmm don't understand this yet...
 
-    Character ROM is actually @ #D000-#DFFF, VIC BANK 3 pos 3,4
+OBS   Character ROM is actually @ #D000-#DFFF, VIC BANK 3 pos 3,4
+OBS   Same positions as the VIC-II control registers
+OBS   HOW IS THIS POSSIBLE???
+OBS   VIC chip can switch in/out the Char ROM when it needs to
+OBS   So either I/O (+ more) or Char ROM is at these locations
+
+      ###########################################
+      # VIC CHIP - and its 47 Control registers #
+      # @ #D000 -> #D02E                        #
+      # @ 53248 -> 53294                        #
+      # %1101 0000 0000 0000                    #
+      # %1101 0000 0010 1110                    #
+      ###########################################
+    
+    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #D000 - #D7FF [2k] (53248 - 55295) No char gen rom 
+    	[512] => #D000 - #D1FF / #1000 - #11FF Upper case chars
+        [512] => #D200 - #D3FF / #1200 - #13FF Graph chars
+        [512] => #D400 - #D5FF / #1400 - #15FF Upper case reversed
+        [512] => #D600 - #D7FF / #1600 - #17FF Graph chars reversed
+
+    (4) POKE 53272, (PEEK(53272) AND 240) OR 6  => #D800 - #DFFF [2k] (55296 - 57343) No char gen rom
+        [512] => #D800 - #D9FF / #1800 - #19FF Lower case chars
+        [512] => #DA00 - #DBFF / #1A00 - #1BFF Upper case & graph chars?
+        [512] => #DC00 - #DDFF / #1C00 - #1DFF Lower case reversed chars
+        [512] => #DE00 - #DFFF / #1E00 - #1FFF Upper case reversed & graph?
+
+OBS   When Char ROM is switched in NO INTERUPTS ARE ALLOWED
+
+==========================
+= TURN OFF INTERRUPTS
+==========================
+
+
+todo...
+
+==========================
+= TURN ON INTERRUPTS
+==========================
+
+todo...
 
 - - - - - - - - - - - - - -
 - - - - - - - - - - - - - -
