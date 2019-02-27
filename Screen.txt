@@ -387,9 +387,9 @@ OBS   When Char ROM is switched in instead of I/O, NO INTERUPTS ARE ALLOWED.
      - - - - - - - - - - - - - -
      - - - - - - - - - - - - - -
 
-     ==========================
-     = TURN OFF INTERRUPTS
-     ==========================
+==========================
+= TURN OFF INTERRUPTS
+==========================
      POKE 56334, PEEK(56334) AND 254
      
      Start value @ 56334 => 1 = 0000 0001 => #01
@@ -399,9 +399,9 @@ OBS   When Char ROM is switched in instead of I/O, NO INTERUPTS ARE ALLOWED.
      - - - - - - - 
          0000 0000
 	 
-     ==========================
-     = TURN ON INTERRUPTS
-     ==========================
+ ==========================
+ = TURN ON INTERRUPTS
+ ==========================
      POKE 56334, PEEK(56334) OR 1
      
         abcd efg0
@@ -409,9 +409,9 @@ OBS   When Char ROM is switched in instead of I/O, NO INTERUPTS ARE ALLOWED.
      - - - - - - -
         abcd efg1
 	
-     ==========================
-     = SWITCH CHAR ROM IN
-     ==========================
+ ==========================
+ = SWITCH CHAR ROM IN
+ ==========================
      Default Start value @ 1 => 55 = 0011 0111 => #37
      processor "bits" @ 1
      First 3 bits => config mem areas #A000 - #BFFF, #D000 - #DFFF, #E000 - #EFFF 
@@ -437,9 +437,9 @@ OBS   When Char ROM is switched in instead of I/O, NO INTERUPTS ARE ALLOWED.
          .... .011 => (4)   .... .x11 => BASIC ROM  @ #A000 - #BFFF,      kernal rom @ #E000 - #EFFF
 	           => (5.1) .... .011 => CHAR ROM                   @ #D000 - #DFFF
 		   
-     ==========================
-     = SWITCH I/O IN AGAIN
-     ==========================
+ ==========================
+ = SWITCH I/O IN AGAIN
+ ==========================
      POKE 1, PEEK(1) OR 4 
         0011 0011
      OR 0000 0100
@@ -447,7 +447,130 @@ OBS   When Char ROM is switched in instead of I/O, NO INTERUPTS ARE ALLOWED.
         0011 0111 (back to default value @ 1)
 	.... .111 => (4)   .... .x11 => BASIC ROM  @ #A000 - #BFFF,      kernal rom @ #E000 - #EFFF
 	          => (6)   .... .1xx => I/O vissible                @ #D000 - #DFFF
-		  
+
+
+##########################################
+# Character generator ROM                #
+# When I/O is switched out...            #
+# @ #D000 - #D7FF [2k 2048 2048/8 = 256] #
+# @ 53248 - 55295                        #
+# @ 53248 - 57343 [4k 4096 4096/8 = 512] #
+# @ #D000 - #DFFF                        #
+##########################################
+
+   * There exist 2 character sets a 256 bytes
+
+   * A char consists of 8 bytes, Stored normally in ROM (Character generator ROM)
+
+     7 6 5 4 3 2 1 0
+   0 . . . . . . . . (8 bits = 1 byte)
+   1 . . . . . . . . (Each . Is ON/OFF 1/0)
+   2 . . . . . . . .
+   3 . . . . . . . .
+   4 . . . . . . . .
+   5 . . . . . . . .
+   6 . . . . . . . .
+   7 . . . . . . . .
+
+   Default: STANDARD CHARACTER MODE
+
+      * Chars in ROM or RAM
+      * Normally ROM
+      * Define own special graphics for chars in RAM then tell VIC where to find them
+      * Screen MEM => char code
+      * Color RAM  => char color
+
+   ============================================================================
+   = To display a char in color on screen VIC chip does this calculation:     
+   =
+   = Char address = Screen Code * 8 + (Character set * 2048) + (Bank * 16384)
+   =                        
+   = Screen Code         : Char code to poke mem address with... ??? 
+   =                       Do they mean 1 = A, 0 = @
+   = Character set * 2048: Start of character mem
+   = Bank                : ??? 0,1,2,3 ??? 
+   ==============================================================================
+
+   [@] #D000 - #D007, 53248 - 53255 => 8 bytes 8*8 bits = 64 bits
+   [A] #D008 - #D00F, 53256 - 53263 => 8 bytes 8*8 bits = 64 bits
+      7 6 5 4 3 2 1 0 
+    0 . . . 1 1 . . . 0001 1000 #18  24 
+    1 . . 1 1 1 1 . . 0011 1100 #3C  60
+    2 . 1 1 . . 1 1 . 0110 0110 #66 102
+    3 . 1 1 1 1 1 1 . 0111 1110 #7E 126
+    4 . 1 1 . . 1 1 . 0110 0110 #66 102
+    5 . 1 1 . . 1 1 . 0110 0110 #66 102
+    6 . 1 1 . . 1 1 . 0110 0110 #66 102
+    7 . . . . . . . . 0110 0110 #00   0
+   [B] D010 - #
+   [C]
+   [D]
+   [...]
+
+   * Programmable Characters
+
+============================
+= Place character set in RAM
+============================
+
+   1) Pick already defined chars you want to use
+   2) Own char set takes memory from BASIC
+   3) Forbidden start locations:
+      -    0: System stores important data here
+      - 2048: BASIC programs start here
+   4) Best locations
+      - #3000, 12288
+
+   Remember the VIC chip control register #D018? (See above :))
+   - - - - - - - - - - -
+   - #D018
+   - 1101 0000 0001 1000
+   - 53272
+   - - - - - - - - - - -
+   Memory setup register. Memory Control Register. (Screen Memory, Char memory)
+   See Set location of SCREEN MEMORY above
+   POKE 53272, (PEEK(53272) AND 15) OR A
+   But now we want to set CHAR MEMORY
+
+==================================
+= Set location of CHARACTER MEMORY
+==================================
+
+   If Selected VIC Video BANK 0 => $0000-$3fff (0 - 16383)         [16k] => DEFAULT
+
+    (1) POKE 53272, (PEEK(53272) AND 240) OR 0  => #0000 - #07FF [2k] (    0 -  2047 = 2048 locations)
+    (2) POKE 53272, (PEEK(53272) AND 240) OR 2  => #0800 - #0FFF [2k] ( 2048 -  4095)
+    (3) POKE 53272, (PEEK(53272) AND 240) OR 4  => #1000 - #17FF [2k] ( 4096 -  6143) DEFAULT Char Generator Rom
+    (4) ...                                  6  => #1800 - #1FFF [2k] ( 6144 -  8191) DEFAULT Char Generator Rom
+    (5) ...                                  8  => #2000 - #27FF [2k] ( 8192 - 10239
+    (6) ...                                  10 => #2800 - #2FFF [2k] (10240 - 12287
+    (7) POKE 53272, (PEEK(53272) AND 240) OR 12 => #3000 - #37FF [2k] (12288 - 14335
+    (8) ...                                  14 => #3800 - #3FFF [2k] (14336 - 16383
+
+ex 1) POKE 53272, (PEEK(53272) AND 240) + 12)
+
+       0001 0101 (default @ 53272)
+   AND 1111 0000 (240)
+   - - - - - - - 
+       0001 0000 (zero out 4 LSBs)
+     + 0000 1100 (12)
+     - - - - - -
+       0001 1100 (16+8+4 = 28)
+
+ex 2) POKE 53272, (PEEK(53272) AND 240) OR A
+      POKE 53272, (PEEK(53272) AND 240) OR 12
+   
+       0001 0101 (default @ 53272)
+   AND 1111 0000 (240)
+   - - - - - - - 
+       0001 0000 (zero out 4 LSBs)
+    OR 0000 1100 (12)
+    - - - - - - -
+       0001 1100 (16+8+4 = 28)
+
+   POKE 53272, (PEEK(53272) AND 240) + 12) <=> POKE 53272, (PEEK(53272) AND 240) OR 12
+
+
 - - - - - - - - - - - - - -
 - - - - - - - - - - - - - -
 - - #D011               - -
