@@ -534,7 +534,7 @@ O16 colors available in C64, 16 colors can be can be described using only 4 bits
 13 "0000 1101" #0D LIGHT GREEN
 14 "0000 1110" #0E LIGHT BLUE
 15 "0000 1111" #0F LIGHT GREY
-EX) Change color of letter at position "top     left" to white: POKE 55297,1
+EX) Change color of letter at position "top     left" to white: POKE 55296,1
 EX) Change color of letter at position "top    right" to white: POKE 55335,1
 EX) Change color of letter at position "bottom  left" to white: POKE 56256,1
 EX) Change color of letter at position "bottom right" to white: POKE 56295,1
@@ -553,7 +553,8 @@ EX) Change color of letter at position "bottom right" to white: POKE 56295,1
 4 . . . . . . . .
 5 . . . . . . . .
 6 . . . . . . . .
-7 . . . . l l l l
+7 . . . . . . . .
+8 . . . . l l l l
 
 ---------
 - Sprites 
