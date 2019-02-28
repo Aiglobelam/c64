@@ -804,22 +804,22 @@ A color RAM Byte "0000     0000"
                  "HIGH      LOW"
 The lower (LOW) NIBBLE is used to set the forground color.
 O16 colors available in C64, 16 colors can be can be described using only 4 bits
-0  "0000 0000" #00 BLACK
-1  "0000 0001" #01 WHITE
-2  "0000 0010" #02 RED
-3  "0000 0011" #03 CYAN
-4  "0000 0100" #04 PURPLE
-5  "0000 0101" #05 GREEN
-6  "0000 0110" #06 BLUE
-7  "0000 0111" #07 YELLOW
-8  "0000 1000" #08 ORANGE
-9  "0000 1001" #09 BROWN
-10 "0000 1010" #0A PINK
-11 "0000 1011" #0B DARK KREY
-12 "0000 1100" #0C GREY
-13 "0000 1101" #0D LIGHT GREEN
-14 "0000 1110" #0E LIGHT BLUE
-15 "0000 1111" #0F LIGHT GREY
+0  "0000 0000" #00 BLACK       (Bit 3: Off => Screen position will become standard high resolution mode)
+1  "0000 0001" #01 WHITE       (Bit 3: Off => Screen position will become standard high resolution mode)
+2  "0000 0010" #02 RED         (Bit 3: Off => Screen position will become standard high resolution mode)
+3  "0000 0011" #03 CYAN        (Bit 3: Off => Screen position will become standard high resolution mode)
+4  "0000 0100" #04 PURPLE      (Bit 3: Off => Screen position will become standard high resolution mode)
+5  "0000 0101" #05 GREEN       (Bit 3: Off => Screen position will become standard high resolution mode)
+6  "0000 0110" #06 BLUE        (Bit 3: Off => Screen position will become standard high resolution mode)
+7  "0000 0111" #07 YELLOW      (Bit 3: Off => Screen position will become standard high resolution mode)
+8  "0000 1000" #08 ORANGE      (Bit 3: On  => Screen position will become multi color)
+9  "0000 1001" #09 BROWN       (Bit 3: On  => Screen position will become multi color)
+10 "0000 1010" #0A PINK        (Bit 3: On  => Screen position will become multi color)
+11 "0000 1011" #0B DARK KREY   (Bit 3: On  => Screen position will become multi color)
+12 "0000 1100" #0C GREY        (Bit 3: On  => Screen position will become multi color)
+13 "0000 1101" #0D LIGHT GREEN (Bit 3: On  => Screen position will become multi color)
+14 "0000 1110" #0E LIGHT BLUE  (Bit 3: On  => Screen position will become multi color)
+15 "0000 1111" #0F LIGHT GREY  (Bit 3: On  => Screen position will become multi color)
 EX) Change color of letter at position "top     left" to white: POKE 55296,1
 EX) Change color of letter at position "top    right" to white: POKE 55335,1
 EX) Change color of letter at position "bottom  left" to white: POKE 56256,1
