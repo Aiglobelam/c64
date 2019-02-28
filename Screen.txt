@@ -277,11 +277,161 @@ Vic can see 16K memory at a time
     So when we have set where screen memory should start, that position is the first position
     Then there comes 999 more so we get 1000, and then there are those 24 extra positions...
 
+- - - - - - - - - - - - - -
+- - - - - - - - - - - - - -
+- - #D011               - -
+- - 1101 0000 0001 0001 - -
+- - 53265               - -
+- - - - - - - - - - - - - -
+- - - - - - - - - - - - - -
+
+    Screen control register
+    Defaults to value #1B aka %0001 1011 aka 27 
+
+    Bit #0-#2: Vertical raster scroll.
+    Bit #3: Screen height; 
+            0 = 24 rows; 
+    	1 = 25 rows.
+    Bit #4: 0 = Screen off, complete screen is covered by border; 
+            1 = Screen on, normal screen contents are visible.
+===> Bit #5: 0 = Text mode;
+===>         1 = Bitmap mode.
+    Bit #6: 1 = Extended background mode on.
+    Bit #7: Read: Current raster line (bit #8).
+            Write: Raster line to generate interrupt at (bit #8).
+
+    value @ D011 => print peek(53265)
+    value @ D011 => 27
+    value @ D011 => #1B
+    Value @ D011 => 0001 1011
+                 => 76x4 3210
+                 => x = Bit 5 
+                 => x = 0
+                 => Text mode is activated
+
+=====================
+= Turn on BITMAP MODE
+=====================
+
+    poke 53265, peek(53265) or 32
+    poke 53265, 0001 1011   or 32 (bit 5 is 0)
+
+            0001 1011
+         OR 0010 0000 (32)
+         - - - - - - -
+	    0011 1011
+            76x4 3210 => Bit 5(x) is now 1 => Bit map mode is on
+
+=====================
+= Turn on TEXT   MODE
+=====================
+
+    poke 53265, peek(53265) and 223
+    poke 53265, 0011 1011   and 223 (bit 5 is 1 if bit map mode is on)
+            
+            0011 1011
+        AND 1101 1111 (zero out high 8 bits, keep low 8 except bit 5)
+        - - - - - - -
+            0001 0001
+              54 3210 => Bit 5 is 0 => Bit map off => text mode on
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<> SPRITES
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+--------
+- Color => in Bitmap mode
+--------
+* Colors are taken from the 1000 position screen memory (1024-2023)
+* Each position is 8x8 64 bits
+* u = upper 4 bits, if a bit is 1 it will have this color
+* l = lower 4 bits, if a bit is 0 it will have this color
+  1 2 3 4 5 6 7 8
+1 u u u u . . . .
+2 . . . . . . . .
+3 . . . . . . . .
+4 . . . . . . . .
+5 . . . . . . . .
+6 . . . . . . . .
+7 . . . . . . . .
+8 . . . . l l l l
+
+---------
+- Sprites 
+---------
+1 Sprite = 64 bytes
+A Standard Sprite on c64 is 24x21=504
+504 bits = 63 bytes => 503/8=63 
+63 bytes per Sprite Shape, a trailin 0 Byte is added at the end.
+64 bytes per Sprite Shape 
+
+-----------------
+- Sprite pointers
+-----------------
+Did you notice they are directyl after the Unused memory?
+Sprite pointers are located at 2040-2047 $07F8-$07FF that is 8 Bytes
+1) $07f8
+2) $07f9
+3) $07fa
+4) $07fb
+5) $07fc
+6) $07fd
+7) $07fe
+8) $07ff
+
+If 1) $07F8 points to/is set to #$00 data for sprite will be at pos $0000 in mem
+If 1) $07F8 = #$01 data for sprite will be at pos $0040 in mem
+If 1) $07F8 = #$02 data for sprite will be at pos $0080 in mem
+If 1) $07F8 = #$03 data for sprite will be at pos $00C0 in mem
+. . .
+If 1) $07F8 = #$80 data for sprite will be at pos $2000 in mem
+
+Formula: "sprite size in bytes" * "number stored in pointer" = "location in mem where sprite is"
+Formula:         #$40           *              $80           = $2000 
+
+-----------------
+- Sprite Enablers
+-----------------
+Enable sprites register = $d015
+If $d015 is $00 no sprites enabled         0000 0000
+If $d015 is $01 sprite 1 is enabled        0000 0001
+If $d015 is $02 sprite 2 is enabled        0000 0010
+If $d015 is $03 sprite 1 and 2 are enabled 0000 0011
+If $d015 is $04 sprite 3 is enabled        0000 0100
+If $d015 is $05 sprite 1 and 3 are enabled 0000 0101
+If $d015 is $06 sprite 2 and 3 are enabled 0000 0110
+If $d015 is $07 sprite 1,2,3 are enabled   0000 0111
+...
+If $d015 is $ff sprite 1,2,3,4,5,6,7,8 are enabled 1111 1111
+
+-------------------------
+- Sprite positioning x,y
+------------------------- 
+1) $07f8 x:$d000, y:$d001
+2) $07f9 x:$d002, y:$d003
+3) $07fa x:$d004, y:$d005
+4) $07fb x:$d006, y:$d007
+5) $07fc x:$d008, y:$d009
+6) $07fd x:$d00a, y:$d00b
+7) $07fe x:$d00c, y:$d00d
+8) $07ff x:$d00e, y:$d00f
+
+$d010 move across all screen?
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<> Chars below just chars more chars and chars
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
 ==================================
 = Set location of CHARACTER MEMORY
 ==================================
 
     * Manipulate bit 321 s of #D018
+    * #D018 Memory setup register. Memory Control Register. (Screen Memory, Char memory) (see above...)
     * Char set consists of 256 chars, each char is 8 bytes
       7 6 5 4 3 2 1 0
     0 . . . . . . . . (8 bits = 1 byte)
@@ -591,73 +741,56 @@ ex 2) POKE 53272, (PEEK(53272) AND 240) OR A
 
    Program moves chars form Char gen ROM to specified RAM locations
 
-   5  printchr$(142)                  :rem switch to upper case char set
-   10 poke 52,48: poke 56,48, clr     :rem reserve mem for chars
-   20 poke 56334, peek(56334) and 254 :rem turn off interrupts / keyscan interrupt timer
-   30 poke 1, peek(1) and 251         :rem switch in char rom in
-   40 for i=0 to 511: poke 1+12288, peek(i+53248): next
-   50 poke 1, peek(1) or 4            : rem switch in i/o
-   60 poke 56334, peek(56334) or 1    : rem turn on interrupts / restart keyscan interrupt timer
+   5  printchr$(142)
+   10 poke 52,48: poke 56,48: clr
+   20 poke 56334, peek(56334) and 254
+   30 poke 1, peek(1) and 251
+   40 for i=0 to 511: poke i+12288, peek(i+53248): next
+   50 poke 1, peek(1) or 4
+   60 poke 56334, peek(56334) or 1
    70 end
+   
+   5  => switch to upper case char set (142), 147 => clear screen
+   10 => reserve mem for your chars, make BASIC not overwrite them
+   20 => turn off interrupts / keyscan interrupt timer
+   30 => switch in char rom in (will be at #D000)
+   40 => copy 512 chars from ROM 53248/#D000 to RAM 12288/#3000 => Best location for chars
+   50 => switch in i/o
+   60 => turn on interrupts / restart keyscan interrupt timer
+   70 => end of pro
+
+   DEBUG version =)
+   
+1  print"start, switch to uppercase..."
+5  printchr$(142)
+6  print"done, clear mem for chars"
+7  for i=0 to 511: poke i+12288,0: next i
+8  print"done, now move basic mem..."
+10 poke 52,48: poke 56,48: clr
+12 print"done, turn of interrupts"
+20 poke 56334, peek(56334) and 254
+22 print"done, switch in char rom to #d000"
+30 poke 1, peek(1) and 251
+32 print"done, copy from rom #d000 to ram #3000"
+40 for i=0 to 511: poke i+12288, peek(i+53248) : next
+42 print"done, switch back in i/o"
+50 poke 1, peek(1) or 4
+52 print"done, turn on interrupts again"
+60 poke 56334, peek(56334) or 1
+61 print"done, program halt."
+62 print"try: poke 53272, (peek(53272) and 240) or 12"
+70 end
+
+   Set c64 to use newly defined charset at #3000
+   
+   poke 53272, (peek(53272) and 240) or 12
+   
+   =========================
+   = Code for reverse @ sign
+   =========================
+   for i = 12288 to 12288+7:poke i, 255 - peek(i) : next
 
 
-- - - - - - - - - - - - - -
-- - - - - - - - - - - - - -
-- - #D011               - -
-- - 1101 0000 0001 0001 - -
-- - 53265               - -
-- - - - - - - - - - - - - -
-- - - - - - - - - - - - - -
-
-    Screen control register
-    Defaults to value #1B aka %0001 1011 aka 27 
-
-    Bit #0-#2: Vertical raster scroll.
-    Bit #3: Screen height; 
-            0 = 24 rows; 
-    	1 = 25 rows.
-    Bit #4: 0 = Screen off, complete screen is covered by border; 
-            1 = Screen on, normal screen contents are visible.
-===> Bit #5: 0 = Text mode;
-===>         1 = Bitmap mode.
-    Bit #6: 1 = Extended background mode on.
-    Bit #7: Read: Current raster line (bit #8).
-            Write: Raster line to generate interrupt at (bit #8).
-
-    value @ D011 => print peek(53265)
-    value @ D011 => 27
-    value @ D011 => #1B
-    Value @ D011 => 0001 1011
-                 => 76x4 3210
-                 => x = Bit 5 
-                 => x = 0
-                 => Text mode is activated
-
-=====================
-= Turn on BITMAP MODE
-=====================
-
-    poke 53265, peek(53265) or 32
-    poke 53265, 0001 1011   or 32 (bit 5 is 0)
-
-            0001 1011
-         OR 0010 0000 (32)
-         - - - - - - -
-	    0011 1011
-            76x4 3210 => Bit 5(x) is now 1 => Bit map mode is on
-
-=====================
-= Turn on TEXT   MODE
-=====================
-
-    poke 53265, peek(53265) and 223
-    poke 53265, 0011 1011   and 223 (bit 5 is 1 if bit map mode is on)
-            
-            0011 1011
-        AND 1101 1111 (zero out high 8 bits, keep low 8 except bit 5)
-        - - - - - - -
-            0001 0001
-              54 3210 => Bit 5 is 0 => Bit map off => text mode on
 
 --------------------
 - Color Memory / RAM => character aka text mode
@@ -691,82 +824,3 @@ EX) Change color of letter at position "top     left" to white: POKE 55296,1
 EX) Change color of letter at position "top    right" to white: POKE 55335,1
 EX) Change color of letter at position "bottom  left" to white: POKE 56256,1
 EX) Change color of letter at position "bottom right" to white: POKE 56295,1
-
---------
-- Color => in Bitmap mode
---------
-* Colors are taken from the 1000 position screen memory (1024-2023)
-* Each position is 8x8 64 bits
-* u = upper 4 bits, if a bit is 1 it will have this color
-* l = lower 4 bits, if a bit is 0 it will have this color
-  1 2 3 4 5 6 7 8
-1 u u u u . . . .
-2 . . . . . . . .
-3 . . . . . . . .
-4 . . . . . . . .
-5 . . . . . . . .
-6 . . . . . . . .
-7 . . . . . . . .
-8 . . . . l l l l
-
----------
-- Sprites 
----------
-1 Sprite = 64 bytes = $40 = 0100 0000
-A Standard Sprite on c64 is 24x21=504
-504 bits = 63 bytes => 503/8=63 
-63 bytes per Sprite Shape, a trailin 0 Byte is added at the end.
-64 bytes per Sprite Shape 
-
------------------
-- Sprite pointers
------------------
-Did you notice they are directyl after the Unused memory?
-Sprite pointers are located at 2040-2047 $07F8-$07FF that is 8 Bytes
-1) $07f8
-2) $07f9
-3) $07fa
-4) $07fb
-5) $07fc
-6) $07fd
-7) $07fe
-8) $07ff
-
-If 1) $07F8 points to/is set to #$00 data for sprite will be at pos $0000 in mem
-If 1) $07F8 = #$01 data for sprite will be at pos $0040 in mem
-If 1) $07F8 = #$02 data for sprite will be at pos $0080 in mem
-If 1) $07F8 = #$03 data for sprite will be at pos $00C0 in mem
-. . .
-If 1) $07F8 = #$80 data for sprite will be at pos $2000 in mem
-
-Formula: "sprite size in bytes" * "number stored in pointer" = "location in mem where sprite is"
-Formula:         #$40           *              $80           = $2000 
-
------------------
-- Sprite Enablers
------------------
-Enable sprites register = $d015
-If $d015 is $00 no sprites enabled         0000 0000
-If $d015 is $01 sprite 1 is enabled        0000 0001
-If $d015 is $02 sprite 2 is enabled        0000 0010
-If $d015 is $03 sprite 1 and 2 are enabled 0000 0011
-If $d015 is $04 sprite 3 is enabled        0000 0100
-If $d015 is $05 sprite 1 and 3 are enabled 0000 0101
-If $d015 is $06 sprite 2 and 3 are enabled 0000 0110
-If $d015 is $07 sprite 1,2,3 are enabled   0000 0111
-...
-If $d015 is $ff sprite 1,2,3,4,5,6,7,8 are enabled 1111 1111
-
--------------------------
-- Sprite positioning x,y
-------------------------- 
-1) $07f8 x:$d000, y:$d001
-2) $07f9 x:$d002, y:$d003
-3) $07fa x:$d004, y:$d005
-4) $07fb x:$d006, y:$d007
-5) $07fc x:$d008, y:$d009
-6) $07fd x:$d00a, y:$d00b
-7) $07fe x:$d00c, y:$d00d
-8) $07ff x:$d00e, y:$d00f
-
-$d010 move across all screen?
