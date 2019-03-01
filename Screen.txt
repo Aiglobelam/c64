@@ -337,6 +337,142 @@ Vic can see 16K memory at a time
 
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<> COLORS
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+(+) Standard High resolution graphics
+
+   Char mode 8x8 matrix
+
+    7 6 5 4 3 2 1 0
+   7 . . . . . . . .
+   6 . . . . . . . .
+   5 . . . . . . . .
+   4 . . . . . . . .
+   3 . . . . . . . .
+   2 . . . . . . . .
+   1 . . . . . . . .
+   0 . . . . . . . .
+
+   Color Background 
+   Color Forground
+	
+      1 = On  = Colored with chosen character color for that screen position
+      0 = Off = Colored with the color of the "screen"
+
+(+) Multi color mode
+
+   4 colors for each dot
+
+   1) Color Screen     AKA "screen color" background color register #0 #D021 53281
+   2) Color Background AKA color in       background color register #1 #D022 53282
+   3) Color Background AKA color in       background color register #2 #D023 53283
+   4) Color Character  AKA Character color 
+
+   - - - - - - - - - - - - - -
+   - - - - - - - - - - - - - -
+   - - #D016               - -
+   - - 1101 0000 0001 0110 - -
+   - - 53270               - -
+   - - - - - - - - - - - - - -
+   - - - - - - - - - - - - - -
+
+   #D016/53270: Screen control register #2.
+   Notice #D011 is Screen control register #1.
+   Defat value @ #D016 => #C8 => 1100 1000 => 200
+                          (Bits) 7654 3210
+
+   Bit 0: Horizontal raster scroll
+   Bit 1: Horizontal raster scroll
+   Bit 2: Horizontal raster scroll
+   Bit 3: Screen width: 0 = 38 columns, 1 = 40 columns
+   Bit 4: 1 = Multi color mode on, 0 = Multi color mode off
+   Bit 5: ?
+   Bit 6: ?
+   Bit 7: ?
+
+(+) Extended background color mode
+
+   Only first 64 chars in Char ROM can be used
+   Set background/foreground color of each char
+   Foreground: Set in color RAM
+   Background: ...
+   TODO: read mote about this mode...
+
+====================================
+= Turn on multi color CHARACTER mode
+====================================
+
+   poke 53270, peek(53270) or 16
+
+      1100 1000 (200 / #C8 : Default value @ #D016)
+   OR 0001 0000 (16, turn bit 4 ON/1, leave rest of bits as they were)
+   - - - - - - -
+      1101 1000
+
+=====================================
+= Turn off multi color CHARACTER mode
+=====================================
+
+   poke 53270, peek(53270) and 239
+
+       1101 1000 (200 / #C8 : Default value @ #D016 + multi color on)
+   AND 1110 1111 (239, turn bit 4 Off/0, leave rest as they were)
+   - - - - - - -
+       ...0 ....
+
+
+"IMAGE A"
+
+  76543210
+  ||||||||
+7-00011000 ...11... (0): Screen Color @ #D021/53281 (background color register #0)
+6-00111100 ..1111.. (1): Color char   @ #D800+index / 55296+index (lower 3 bits)
+5-01100110 .11..11.
+4-01111110 .111111.
+3-01100110 .11..11.
+2-01100110 .11..11.
+1-01100110 .11..11.
+0-00000000 ........
+
+"IMAGE A"
+
+  76 54 32 10
+  || || || ||
+7-00 01 10 00 (00): Screen Color     @ #D021/53281 (background color register #0)
+6-00 11 11 00 (01): Color background @ #D022/53282 (background color register #1)
+5-01 10 01 10 (10): Color background @ #D023/53283 (background color register #2)
+4-01 11 11 10 (11): Color char       @ #D800+index / 55296+index (lower 3 bits)
+3-01 10 01 10       Char foreground color is "11", for sprites it is "10"
+2-01 10 01 10
+1-01 10 01 10
+0-00 00 00 00
+
+
+100 poke 53281,1                  // White "Screen Color"
+110 poke 53282,3                  // Cyan  "
+120 poke 53283,8                  // Orange
+130 poke 53270, peek(53270) or 16 // Turn on multi color mode 
+140 c=13*4096+8*256               // 55296 aka #D800, start char color mem RAM
+150 printchr$(147)"aaaaaaaaaa"    // 147 CLR HOME, then print 10 "a"
+160 for i = 0 to 4                // for 0-4 (5 times)
+170 poke c+i,8                    // char color orange!?, 8, "0000 1000" (only lower 3 bits)
+180 next                          // "multi color black"            000 => Zero is black in c64
+
+
+100 poke 53281,1
+110 poke 53282,3
+120 poke 53283,8
+130 poke 53270, peek(53270) or 16
+140 c=13*4096+8*256
+150 printchr$(147)"aaaaaaaaaa"
+160 for i = 0 to 4
+170 poke c+i,8
+180 next
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 <> SPRITES
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
