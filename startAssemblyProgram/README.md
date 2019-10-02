@@ -14,6 +14,8 @@ BasicUpstart2(start)
 start:  inc $d021
         jmp start
 ```
+-  `BasicUpstart2(start)`: *Magic macro that somehow start our code...*
+-  `* = $4000`: *Way to tell kickass where our code should strt in memory*
 - `inc`: *opcode for increase numeric value at specified mem address*
 - `$d021`: *Memory location for Background color (only bits #0-#3)*
 - `jmp`: *Transfer program execution to this place, here we use a label instead of address...*
