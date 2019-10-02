@@ -1,4 +1,5 @@
-# Diffrent ways of starting an assembly program that I know of
+# How to start a c64 progrm
+For me known ways of starting an assembly program...
 
 ## Basic Loader technique - 1
 - Assembler: Kickassembler
@@ -15,8 +16,37 @@ start:  lda #48
 ```
 ### Build program
 Command: `java -jar ~/dev/c64/compilers/KickAssembler/KickAss.jar -bytedump myCode.asm`
-- option: `-bytedump` 
-Dumps the assembled bytes in the file ByteDump.txt together with the code that generated them.
+- option: `-bytedump`: *Dumps the assembled bytes in the file ByteDump.txt together with the code that generated them.*
+
+* File: `myCode.sym`
+```
+.label start=$4000
+```
+* File: `ByteDump.txt`
+```
+******************************* Segment: Default *******************************
+[Basic]
+0801: 0c 08     -
+0803: 0a 00     -
+0805: 9e        -
+0806: 31 36 33 38 34                                   -
+080b: 00        -
+080c: 00 00     - upstartEnd:
+
+[Unnamed]
+4000: a9 30     - start:  lda #48
+4002: 20 d2 ff  -         jsr $ffd2
+4005: 00        -         brk
+```
+* File: `myCode.prg`
+Command: `hexdump myCode.prg`
+```
+0000000 01 08 0c 08 0a 00 9e 31 36 33 38 34 00 00 00 00
+0000010 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+*
+0003800 00 a9 30 20 d2 ff 00
+0003807
+```
 
 
 ## Basic Loader technique - 2
