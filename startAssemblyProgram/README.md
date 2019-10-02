@@ -49,7 +49,7 @@ Command: `java -jar ~/dev/c64/compilers/KickAssembler/KickAss.jar -bytedump myCo
 ### Files
 * File: `myCode.sym`
 ```
-.label start=$4000
+       .label start=$4000
 ```
 
 * File: `ByteDump.txt`
@@ -86,8 +86,12 @@ Contains the addres for where BASIC is stored in memory => SOB, (**S**)tart (**O
        $002B: $01 (Low Byte First)
        $002C: $08
 ```
-Result: $0801
+Result: `$0801`, From this address, if you write a Basic program, it will take up memory in between SOB to EOB (End of...).
 
+As we see in the build output for example file `ByteDump.txt`: mem location `0801` contains: `0c 08` which tells Basic at which mem address the next Basic instruction start (*common knowledge nudge nudge*). And if we look at adress `080c` we see the values `00 00` which indicates end of Basic program (*more common knowledge...*). But what lies in between those rows?
+
+
+To be continued...
 
 
 ## Basic Loader technique - 2
