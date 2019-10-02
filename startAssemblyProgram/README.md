@@ -1,19 +1,25 @@
 # Diffrent ways of starting an assembly program that I know of
 
-## Basic Loader technique from kickass
+## Basic Loader technique - 1
 - Assembler: Kickassembler
 - Macro: BasicUpstart2
 ### Example program
-This program uses Kickass macro called "BasicUpstart2", you send it a label as input paraam
+This program uses Kickass macro called "BasicUpstart2", you send it a label as input param
+* File: `myCode.asm`
+
 ```
 BasicUpstart2(start)
         * = $4000
 start:  lda #48
         jsr $ffd2
 ```
-- compile
+### Build program
+Command: `java -jar ~/dev/c64/compilers/KickAssembler/KickAss.jar -bytedump myCode.asm`
+- option: `-bytedump` 
+Dumps the assembled bytes in the file ByteDump.txt together with the code that generated them.
 
-## Basic Loader technique 2
+
+## Basic Loader technique - 2
 
 *=$0801 ; 10 SYS (2064)
 
