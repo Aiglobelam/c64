@@ -4,15 +4,16 @@ For me known ways of starting an assembly program...
 ## Basic Loader technique - 1
 - Assembler: Kickassembler
 - Macro: BasicUpstart2
+
 ### Example program
 This program uses Kickass macro called "BasicUpstart2", you send it a label as input param
 * File: `myCode.asm`: *Will make screen crazy =), progrm loops for ever.*
 
 ```
-BasicUpstart2(start)
-        * = $4000
-start:  inc $d021
-        jmp start
+       BasicUpstart2(start)
+               * = $4000
+       start:  inc $d021
+               jmp start
 ```
 -  `BasicUpstart2(start)`: *Magic macro that somehow start our code...*
 -  `* = $4000`: *Way to tell kickass where our code should start in memory*
@@ -25,26 +26,27 @@ Command: `java -jar ~/dev/c64/compilers/KickAssembler/KickAss.jar -bytedump myCo
 - option: `-bytedump`: *Dumps the assembled bytes in the file ByteDump.txt together with the code that generated them.*
 
 ```
-//------------------------------------------------------
-//------------------------------------------------------
-//          Kick Assembler v5.7 by Mads Nielsen
-//------------------------------------------------------
-//------------------------------------------------------
-parsing
-flex pass 1
-flex pass 2
-flex pass 3
-Output pass
-Writing prg file: myCode.prg
+       //------------------------------------------------------
+       //------------------------------------------------------
+       //          Kick Assembler v5.7 by Mads Nielsen
+       //------------------------------------------------------
+       //------------------------------------------------------
+       parsing
+       flex pass 1
+       flex pass 2
+       flex pass 3
+       Output pass
+       Writing prg file: myCode.prg
 
-Memory Map
-----------
-Default-segment:
-  $0801-$080d Basic
-  $080e-$080d Basic End
-  $4000-$4005 Unnamed
+       Memory Map
+       ----------
+       Default-segment:
+         $0801-$080d Basic
+         $080e-$080d Basic End
+         $4000-$4005 Unnamed
 ```
 
+### Files
 * File: `myCode.sym`
 ```
 .label start=$4000
@@ -52,29 +54,39 @@ Default-segment:
 
 * File: `ByteDump.txt`
 ```
-******************************* Segment: Default *******************************
-[Basic]
-0801: 0c 08     -
-0803: 0a 00     -
-0805: 9e        -
-0806: 31 36 33 38 34                                   -
-080b: 00        -
-080c: 00 00     - upstartEnd:
+       ******************************* Segment: Default *******************************
+       [Basic]
+       0801: 0c 08     -
+       0803: 0a 00     -
+       0805: 9e        -
+       0806: 31 36 33 38 34                                   -
+       080b: 00        -
+       080c: 00 00     - upstartEnd:
 
-[Unnamed]
-4000: ee 21 d0  - start:  inc $d021
-4003: 4c 00 40  -         jmp start
+       [Unnamed]
+       4000: ee 21 d0  - start:  inc $d021
+       4003: 4c 00 40  -         jmp start
 ```
 
 * File: `myCode.prg`
 Command: `hexdump myCode.prg`
 ```
-0000000 01 08 0c 08 0a 00 9e 31 36 33 38 34 00 00 00 00
-0000010 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-*
-0003800 00 ee 21 d0 4c 00 40
-0003807
+       0000000 01 08 0c 08 0a 00 9e 31 36 33 38 34 00 00 00 00
+       0000010 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+       *
+       0003800 00 ee 21 d0 4c 00 40
+       0003807
 ```
+
+### Explination
+In a commodore C64, address locations `$002B` and `$002C` ("zero pages": $2B and $2C)
+
+Contains the addres for where BASIC is stored in memory => SOB, (**S**)tart (**O**)f (**B**)asic
+```
+       $002B: $01 (Low Byte First)
+       $002C: $08
+```
+Result: $0801
 
 
 
