@@ -14,7 +14,9 @@ BasicUpstart2(start)
 start:  inc $d021
         jmp start
 ```
-- $ffd2: CHROUT: *Output an ASCII char from A-reg to Screen/Disk/Cassette/Tape/Device X*
+- `inc`: *opcode for increase numeric value at specified mem address*
+- `$d021`: *Memory location for Background color (only bits #0-#3)*
+- `jmp`: *Transfer program execution to this place, here we use a label instead of address...*
 
 ### Build program
 Command: `java -jar ~/dev/c64/compilers/KickAssembler/KickAss.jar -bytedump myCode.asm`
