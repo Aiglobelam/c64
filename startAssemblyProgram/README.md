@@ -6,7 +6,7 @@ For me known ways of starting an assembly program...
 - Macro: BasicUpstart2
 ### Example program
 This program uses Kickass macro called "BasicUpstart2", you send it a label as input param
-* File: `myCode.asm`: *Will make screen crazy =)*
+* File: `myCode.asm`: *Will make screen crazy =), progrm loops for ever.*
 
 ```
 BasicUpstart2(start)
@@ -15,8 +15,8 @@ start:  inc $d021
         jmp start
 ```
 -  `BasicUpstart2(start)`: *Magic macro that somehow start our code...*
--  `* = $4000`: *Way to tell kickass where our code should strt in memory*
-- `inc`: *opcode for increase numeric value at specified mem address*
+-  `* = $4000`: *Way to tell kickass where our code should start in memory*
+- `inc`: *opcode for increase numeric value at specified mem address (inc value at $d021)*
 - `$d021`: *Memory location for Background color (only bits #0-#3)*
 - `jmp`: *Transfer program execution to this place, here we use a label instead of address...*
 
@@ -75,6 +75,7 @@ Command: `hexdump myCode.prg`
 0003800 00 ee 21 d0 4c 00 40
 0003807
 ```
+
 
 
 ## Basic Loader technique - 2
