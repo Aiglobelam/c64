@@ -6,22 +6,46 @@ For me known ways of starting an assembly program...
 - Macro: BasicUpstart2
 ### Example program
 This program uses Kickass macro called "BasicUpstart2", you send it a label as input param
-* File: `myCode.asm`
+* File: `myCode.asm`: *Will make screen crazy =)*
 
 ```
 BasicUpstart2(start)
         * = $4000
-start:  lda #48
-        jsr $ffd2
+start:  inc $d021
+        jmp start
 ```
+- $ffd2: CHROUT: *Output an ASCII char from A-reg to Screen/Disk/Cassette/Tape/Device X*
+
 ### Build program
 Command: `java -jar ~/dev/c64/compilers/KickAssembler/KickAss.jar -bytedump myCode.asm`
 - option: `-bytedump`: *Dumps the assembled bytes in the file ByteDump.txt together with the code that generated them.*
+
+```
+//------------------------------------------------------
+//------------------------------------------------------
+//          Kick Assembler v5.7 by Mads Nielsen
+//------------------------------------------------------
+//------------------------------------------------------
+parsing
+flex pass 1
+flex pass 2
+flex pass 3
+Output pass
+Writing prg file: myCode.prg
+
+Memory Map
+----------
+Default-segment:
+  $0801-$080d Basic
+  $080e-$080d Basic End
+  $4000-$4005 Unnamed
+```
 
 * File: `myCode.sym`
 ```
 .label start=$4000
 ```
+
 * File: `ByteDump.txt`
 ```
 ******************************* Segment: Default *******************************
@@ -34,17 +58,17 @@ Command: `java -jar ~/dev/c64/compilers/KickAssembler/KickAss.jar -bytedump myCo
 080c: 00 00     - upstartEnd:
 
 [Unnamed]
-4000: a9 30     - start:  lda #48
-4002: 20 d2 ff  -         jsr $ffd2
-4005: 00        -         brk
+4000: ee 21 d0  - start:  inc $d021
+4003: 4c 00 40  -         jmp start
 ```
+
 * File: `myCode.prg`
 Command: `hexdump myCode.prg`
 ```
 0000000 01 08 0c 08 0a 00 9e 31 36 33 38 34 00 00 00 00
 0000010 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 *
-0003800 00 a9 30 20 d2 ff 00
+0003800 00 ee 21 d0 4c 00 40
 0003807
 ```
 
