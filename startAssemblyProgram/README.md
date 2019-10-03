@@ -78,25 +78,29 @@ Command: `hexdump myCode.prg`
        0003807
 ```
 
-### Explination
+### SOB - Start Of Basic
 In a commodore C64, address locations `$002B` and `$002C` ("zero pages": $2B and $2C)
 
-Contains the addres for where BASIC is stored in memory => SOB, (**S**)tart (**O**)f (**B**)asic
+Contains the addres for where the BASIC program is stored in memory => SOB, (**S**)tart (**O**)f (**B**)asic
 ```
        $002B: $01 (Low Byte First)
        $002C: $08
 ```
 Result: `$0801`, From this address, if you write a Basic program, it will take up memory in between SOB to EOB (End of...).
 
-* File: `ByteDump.txt` - revisit...
+### File: `ByteDump.txt` - revisit
 
-`0801: 0c 08`: As we see in the build output for example file `ByteDump.txt`: mem location `0801` contains: `0c 08` which tells Basic at which mem address the next Basic instruction start (*common knowledge nudge nudge*). And if we look at adress `080c` we see the values `00 00` which indicates end of Basic program (*more common knowledge...*). But what lies in between those rows?
+#### `0801: 0c 08`
+As we see in the build output for example file `ByteDump.txt`: mem location `0801` contains: `0c 08` which tells Basic at which mem address the next Basic instruction start (*common knowledge nudge nudge*). And if we look at adress `080c` we see the values `00 00` which indicates end of Basic program (*more common knowledge...*). But what lies in between those rows?
 
-`0803: 0a 00`: So what is this... google "C64 address 000a" gives us something about `LOAD/VERIFY switch. Values:` hmmm wtf??? can't be that? It might be an opcode!? Ok more googling... `00` is **BRK** `0a` is **ASL** hmmm this does not make sense!? Can we think in another way... **epiphany**!!!! Lets pretend we are BASIC, what does the first line of a Basic program starts with? Thats right it starts with a "line number". So `000a` <=> 10 in decimal, which means 10 is our first line number!!!
+#### `0803: 0a 00`
+So what is this `0a 00`? Google "C64 000a" gives us something about `LOAD/VERIFY switch. Values:` hmmm wtf??? can't be that? It might be an opcode!? Ok more googling... `00` is **BRK** `0a` is **ASL** hmmm this does not make sense!? Can we think in another way... **epiphany**!!!! Lets pretend we are BASIC, what does the first line of a Basic program starts with? Thats right it starts with a "line number". So `000a` <=> 10 in decimal, which means 10 is our first line number!!!
 
-`0805: $9E` Ok here we need more knowledge about [Basic tokens](https://www.c64-wiki.com/wiki/BASIC_token). In a Basic progrm whenever the user edits or creates a BASIC line, any keywords are replaced by their respective token, and conversely. In this case `9E` is the Basic [SYS](https://www.c64-wiki.com/wiki/SYS) command. So so far our Basic prg line looks like `10 SYS`
+#### `0805: $9E`
+Ok here we need more knowledge about [Basic tokens](https://www.c64-wiki.com/wiki/BASIC_token). In a Basic progrm whenever the user edits or creates a BASIC line, any keywords are replaced by their respective token, and conversely. In this case `9E` is the Basic [SYS](https://www.c64-wiki.com/wiki/SYS) command. So so far our Basic prg line looks like `10 SYS`
 
-`0806: 31 36 33 38 34`: To be continued...
+#### `0806: 31 36 33 38 34`
+To be continued...
 
 
 ## Basic Loader technique - 2
