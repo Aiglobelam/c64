@@ -100,7 +100,8 @@ So what is this `0a 00`? Google "C64 000a" gives us something about `LOAD/VERIFY
 Ok here we need more knowledge about [Basic tokens](https://www.c64-wiki.com/wiki/BASIC_token). In a Basic progrm whenever the user edits or creates a BASIC line, any keywords are replaced by their respective token, and conversely. In this case `9E` is the Basic [SYS](https://www.c64-wiki.com/wiki/SYS) command. So so far our Basic prg line looks like `10 SYS`
 
 #### `0806: 31 36 33 38 34`
-To be continued...
+So, these numbers `31 36 33 38 34` they seem not to be specific Basic commands. So they must be ordinary "chars", that is the value represents a char in the C64 PETSCII table... and in this case they all seem to be integers `$31`=1, `$36`=6, `$33`=3, `$38`=8, `$34`=4 which is equivalent to the decimal number **16384**. Converted to hex it will be `$4000`. so far our Basic prg line looks like `10 SYS4000` (notice missing space between `SYS` and address `4000`, i guess a missing space is ok there.
+
 
 
 ## Basic Loader technique - 2
