@@ -7,7 +7,7 @@ For me known ways of starting an assembly program...
 
 ### Example program
 This program uses Kickass macro called "BasicUpstart2", you send it a label as input param
-* File: `myCode.asm`: *Will make screen crazy =), progrm loops for ever.*
+* File: `myCode.asm`: *Will make screen crazy =), program loops for ever.*
 
 ```
        BasicUpstart2(start)
@@ -79,11 +79,11 @@ Command: `hexdump myCode.prg`
 ```
 
 ### SOB - Start Of Basic
-In a commodore C64, address locations `$002B` and `$002C` ("zero pages": $2B and $2C)
+In a commodore C64, address locations `$002B` and `$002C` ("zero pages": `$2B` and `$2C`)
 
-Contains the addres for where the BASIC program is stored in memory => SOB, (**S**)tart (**O**)f (**B**)asic
+Contain address for where the BASIC program is stored in memory => SOB, (**S**)tart (**O**)f (**B**)asic
 ```
-       $002B: $01 (Low Byte First)
+       $002B: $01 (remember instruciton are stored as Low Byte First)
        $002C: $08
 ```
 Result: `$0801`, From this address, if you write a Basic program, it will take up memory in between SOB to EOB (End of...).
@@ -91,18 +91,26 @@ Result: `$0801`, From this address, if you write a Basic program, it will take u
 ### File: `ByteDump.txt` - revisit
 
 #### `0801: 0c 08`
-As we see in the build output for example file `ByteDump.txt`: mem location `0801` contains: `0c 08` which tells Basic at which mem address the next Basic instruction start (*common knowledge nudge nudge*). And if we look at adress `080c` we see the values `00 00` which indicates end of Basic program (*more common knowledge...*). But what lies in between those rows?
+As we see in the build output, file `ByteDump.txt`: mem location `0801` is set to contain: `0c 08`. The first two bytes tell Basic at which mem address the next Basic instruction start (*common knowledge nudge nudge*). And if we look at adress `080c` we see the values `00 00` which indicates end of Basic program (*more common knowledge...*). But what lies in between those rows? Next is location `0803` becuase this `0801` took up 2 bytes, 1 byte for `0c` and one byte for `08`. 
 
 #### `0803: 0a 00`
-So what is this `0a 00`? Google "C64 000a" gives us something about `LOAD/VERIFY switch. Values:` hmmm wtf??? can't be that? It might be an opcode!? Ok more googling... `00` is **BRK** `0a` is **ASL** hmmm this does not make sense!? Can we think in another way... **epiphany**!!!! Lets pretend we are BASIC, what does the first line of a Basic program starts with? Thats right it starts with a "line number". So `000a` <=> 10 in decimal, which means 10 is our first line number!!!
+So what is this `0a 00`? Google "C64 000a" gives us something about `LOAD/VERIFY switch. Values:` hmmm wtf??? can't be that? It might be an opcode!? Ok more googling... `00` is **BRK** `0a` is **ASL** hmmm this does not make sense!? Can we think in another way... **epiphany**!!!! Lets pretend we are BASIC, what does the first line of a Basic program starts with? Thats right it starts with a "line number". So `000a` <=> 10 in decimal, which means 10 is our first line number!!! So our Basic program now looks like `10`. Next byte read should be at `0805` cause `0a 00` made used of 2 bytes.
 
 #### `0805: $9E`
-Ok here we need more knowledge about [Basic tokens](https://www.c64-wiki.com/wiki/BASIC_token). In a Basic progrm whenever the user edits or creates a BASIC line, any keywords are replaced by their respective token, and conversely. In this case `9E` is the Basic [SYS](https://www.c64-wiki.com/wiki/SYS) command. So so far our Basic prg line looks like `10 SYS`
+Ok here we need more knowledge about [Basic tokens](https://www.c64-wiki.com/wiki/BASIC_token). In a Basic progrm whenever the user edits or creates a BASIC line, any keywords are replaced by their respective token, and conversely. In this case `9E` is the Basic [SYS](https://www.c64-wiki.com/wiki/SYS) command. So so far our Basic prg line looks like `10 SYS`. Next byte to read should be at `0806` cause we used 1 byte for `9e` for `0805`
 
 #### `0806: 31 36 33 38 34`
-So, these numbers `31 36 33 38 34` they seem not to be specific Basic commands. So they must be ordinary "chars", that is the value represents a char in the C64 PETSCII table... and in this case they all seem to be integers `$31`=1, `$36`=6, `$33`=3, `$38`=8, `$34`=4 which is equivalent to the decimal number **16384**. Converted to hex it will be `$4000`. so far our Basic prg line looks like `10 SYS4000` (notice missing space between `SYS` and address `4000`, i guess a missing space is ok there.
+So, these numbers `31 36 33 38 34` they seem not to be specific Basic commands. So they must be ordinary "chars", that is the value represents a char in the C64 PETSCII table... and in this case they all seem to be integers `$31`=1, `$36`=6, `$33`=3, `$38`=8, `$34`=4 which is equivalent to the decimal number **16384**. Converted to hex it will be `$4000`. so far our Basic prg line looks like `10 SYS4000` (notice missing space between `SYS` and address `4000`, i guess a missing space is ok there. Remember what we told Kickassembler in `myCode.asm`? That our code should start at `$4000` => `* = $4000`. So here we used 5 bytes. Next code shoule be at `080B`
 
+#### `080B: 00`
+A `00` tells Basic we have reached the end of line of the current instruction. So `10 SYS4000` end of line. After EOL Basic now moves on to the next instruction which according to our instructions at `0801` is located at `080C`
 
+#### `080c: 00 00`
+Here Basic reads 2 * `00` which indicates the end of the Basic program. Now Basic exexutes the program first row `10 SYS4000`. SYS executes whats at location `4000`
+
+#### `4000: ee 21 d0`  - start:  inc $d021
+
+#### `4003: 4c 00 40`  -         jmp start
 
 ## Basic Loader technique - 2
 
