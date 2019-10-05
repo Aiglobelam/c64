@@ -8,6 +8,7 @@ For me known ways of starting an assembly program...
 ### Example program
 This program uses Kickass macro called "BasicUpstart2", you send it a label as input param
 * File: `myCode.asm`: *Will make screen crazy =), program loops for ever.*
+<img src="https://github.com/Aiglobelam/c64/blob/master/startAssemblyProgram/incd021.png" width="480px"/>
 
 ```
        BasicUpstart2(start)
