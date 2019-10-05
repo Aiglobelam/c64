@@ -78,6 +78,7 @@ Command: `hexdump myCode.prg`
        0003800 00 ee 21 d0 4c 00 40
        0003807
 ```
+Note to self and other, whats up with the `3800` in the hex dump of `myCode.prg`? Should it not be `4000`? Well if I load the program into Vice and use its **mlm** Machine Language Monitor and inspect the memory by typing `m 4000` I can see the program `ee 21 d0 4c 00 40` there so that seems correct aany how... And space `3800` is empty...
 
 ### SOB - Start Of Basic
 In a commodore C64, address locations `$002B` and `$002C` ("zero pages": `$2B` and `$2C`)
