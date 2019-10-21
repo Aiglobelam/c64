@@ -343,7 +343,7 @@ Vic can see 16K memory at a time
 
 (+) Standard High resolution graphics
 
-   Char mode 8x8 matrix
+   Char mode 8x8 matrix for a char
 
     7 6 5 4 3 2 1 0
    7 . . . . . . . .
@@ -355,11 +355,28 @@ Vic can see 16K memory at a time
    1 . . . . . . . .
    0 . . . . . . . .
 
-   Color Background 
-   Color Forground
+   . = 0 => Color Background
+   . = 1 => Color Forground
+
+     0 = Off
+
+	location: #D021 53281     
+	Color:
+		- color of the screen
+		- screen color
+		- background color register zero
+		- background color register #0
 	
-      1 = On  = Colored with chosen character color for that screen position
-      0 = Off = Colored with the color of the "screen"
+     1 = On
+     
+	location: $D800-$DBE7 55296 - 56295, 
+     	Colore:
+		- With chosen character color for that screen position
+	      	- 1000 Memory positions ranghe from $D800-$DBE7 55296 - 56295
+		- Value 0-15 (16 colors)
+		- OBS: Only in char mode, not bitmap mode
+
+
 
 (+) Multi color mode
 
