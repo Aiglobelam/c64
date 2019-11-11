@@ -212,7 +212,24 @@ Vic can see 16K memory at a time
       01-03E8, 02-03E9, 03-03EA, 04-03EB, 05-03EC, 06-03ED, 07-03EE, 08-03FF, 09-03F0, 10-03F1,
       11-03F2, 12-03F3, 13-03F4, 14-03F5, 15-03F6, 16-03F7, 17-03F8, 18-03F9, 19-03FA, 20-03FB,
       21-03FC, 22-03FD, 23-03FE, 24-03FF
-      Then comes #0400
+      
+      **16 bytes of unused memory**: 
+      
+      01-03E8, 02-03E9, 03-03EA, 04-03EB, 05-03EC, 06-03ED, 07-03EE, 08-03FF, 09-03F0, 10-03F1,
+      11-03F2, 12-03F3, 13-03F4, 14-03F5, 15-03F6, 16-03F7
+      
+      **8 bytes of sprite pointers**:
+      
+      (1) 17-03F8
+      (2) 18-03F9
+      (3) 19-03FA
+      (4) 20-03FB
+      (5) 21-03FC
+      (6) 22-03FD
+      (7) 23-03FE
+      (8) 24-03FF
+      
+      ===> Then comes #0400 which is DEFAULT mem locations
 
     (2) #0400 - #07FF (1000 positions DEFAULT location + 24)
 
@@ -220,7 +237,23 @@ Vic can see 16K memory at a time
       01-07E8, 02-07E9, 03-07EA, 04-07EB, 05-07EC, 06-07ED, 07-07EE, 08-07EF, 09-07F0, 10-07F1,
       11-07F2, 12-07F3, 13-07F4, 14-07F5, 15-07F6, 16-07F7, 17-07F8, 18-07F9, 19-07FA, 20-07FB,
       21-07FC, 22-07FD, 23-07FE, 24-07FF
-      Then comes #0800
+      
+      **16 bytes of unused memory**:
+      01-07E8, 02-07E9, 03-07EA, 04-07EB, 05-07EC, 06-07ED, 07-07EE, 08-07EF, 09-07F0, 10-07F1,
+      11-07F2, 12-07F3, 13-07F4, 14-07F5, 15-07F6, 16-07F7,
+      
+      **8 bytes of sprite pointers**:
+      
+      (1) 17-07F8
+      (2) 18-07F9
+      (3) 19-07FA
+      (4) 20-07FB
+      (5) 21-07FC
+      (6) 22-07FD
+      (7) 23-07FE
+      (8) 24-07FF
+      
+      ===> Then comes #0800
 
     (3) #0800 - #0BFF (1000 + 24 positions)
     (4) #0C00 - #0FFF (1000 + 24 positions)
