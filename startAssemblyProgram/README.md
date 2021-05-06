@@ -104,8 +104,9 @@ Ok here we need more knowledge about [Basic tokens](https://www.c64-wiki.com/wik
 #### `0806: 31 36 33 38 34`
 So, these numbers `31 36 33 38 34` they seem not to be specific Basic commands. So they must be ordinary "chars", that is the value represents a char in the C64 PETSCII table... and in this case they all seem to be integers `$31`=1, `$36`=6, `$33`=3, `$38`=8, `$34`=4 which is equivalent to the decimal number **16384**. Converted to hex it will be `$4000`. so far our Basic prg line looks like `10 SYS4000` (notice missing space between `SYS` and address `4000`, i guess a missing space is ok there. Remember what we told Kickassembler in `myCode.asm`? That our code should start at `$4000` => `* = $4000`. So here we used 5 bytes. Next code shoule be at `080B`. 
 
-PS 1: *Note that these numbers  `31 36 33 38 34` can be other figures, depending on where your assembly program start in memory*
-PS 2: hex `$31`=1, `$31`=2, `$33`=3, `$34`=4`$35`=5, `$36`=6, `$37`=7, `$38`=8, `$39`=9
+**PS 1**: *Note that these numbers  `31 36 33 38 34` can be other figures, depending on where your assembly program start in memory*
+
+**PS 2**: hex `$31`=1, `$31`=2, `$33`=3, `$34`=4`$35`=5, `$36`=6, `$37`=7, `$38`=8, `$39`=9
 
 #### `080B: 00`
 A `00` tells Basic we have reached the end of line of the current instruction. So `10 SYS4000` end of line. After EOL Basic now moves on to the next instruction which according to our instructions at `0801` is located at `080C`
