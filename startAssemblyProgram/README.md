@@ -78,7 +78,7 @@ Command: `hexdump myCode.prg`
        0003800 00 ee 21 d0 4c 00 40
        0003807
 ```
-Note to self and other, whats up with the `3800` in the hex dump of `myCode.prg`? Should it not be `4000`? Well if I load the program into Vice and use its **mlm** Machine Language Monitor and inspect the memory by typing `m 4000` I can see the program `ee 21 d0 4c 00 40` there so that seems correct aany how... And space `3800` is empty...
+Note to self and other, whats up with the `3800` in the hex dump of `myCode.prg`? Should it not be `4000`? Well if I load the program into Vice and use its **mlm** Machine Language Monitor and inspect the memory by typing `m 4000` I can see the program `ee 21 d0 4c 00 40` there so that seems correct aany how... And space `3800` is empty... So I guess I do not quite grasped the bits in this file yet...
 
 ### SOB - Start Of Basic
 In a commodore C64, address locations `$002B` and `$002C` ("zero pages": `$2B` and `$2C`)
@@ -109,7 +109,7 @@ So, these numbers `31 36 33 38 34` they seem not to be specific Basic commands. 
 **PS 2**: hex `$31`=1, `$31`=2, `$33`=3, `$34`=4`$35`=5, `$36`=6, `$37`=7, `$38`=8, `$39`=9
 
 #### `080B: 00`
-A `00` tells Basic we have reached the end of line of the current instruction. So `10 SYS4000` end of line. After EOL Basic now moves on to the next instruction which according to our instructions at `0801` is located at `080C`
+The next instruction line after the number/mem address that holds your program start code, it is followed by a `00`. That tells Basic we have reached the end of line of the current instruction. So `10 SYS4000` followed by **end of line**. After **EOL** Basic now moves on to the next instruction line which according to our instructions at `0801` is located at `080C`
 
 #### `080c: 00 00`
 Here Basic reads 2 * `00` which indicates the end of the Basic program. Now Basic exexutes the program first row `10 SYS4000`. SYS executes the assembly code at location `4000`
